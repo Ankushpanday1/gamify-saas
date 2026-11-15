@@ -1,0 +1,11 @@
+{
+  "name": "gamify-saas",
+  "version": "1.0.0",
+  "description": "Gamification-as-a-Service Platform (like Trophy.so) with authentic reverse-engineered mechanics",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {}
+}
+

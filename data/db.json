@@ -1,0 +1,332 @@
+{
+  "projects": [
+    {
+      "id": "proj_default",
+      "name": "Default Workspace",
+      "apiKey": "pk_live_duo_9821",
+      "createdAt": "2026-11-10T17:38:03.354Z"
+    }
+  ],
+  "widgets": [
+    {
+      "id": "zepto_scratch_01",
+      "type": "zepto_scratch",
+      "name": "Zepto Purple Scratch Card",
+      "appSource": "Zepto (ScreenRecording 11-09)",
+      "status": "active",
+      "config": {
+        "headerEyebrow": "Congratulations",
+        "headerTitle": "Get Your Reward Inside!",
+        "foilTopColor": "#DF7DFF",
+        "foilBottomColor": "#7E35C6",
+        "brandWatermark": "zepto",
+        "brandBadge": "uni•",
+        "rewardTitle": "Lifetime Free Rupay Card",
+        "rewardSubtitle": "5% back on Zepto + 1% back on UPI!",
+        "rewardFootnote": "No minimum spends",
+        "couponCode": "NO CODE NEEDED",
+        "ctaColor": "#F93262",
+        "ctaText": "Claim now",
+        "scratchThresholdPercent": 45,
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 5420,
+        "claims": 4312,
+        "conversionRate": "79.6%"
+      }
+    },
+    {
+      "id": "mynaksh_checkin_02",
+      "type": "mynaksh_checkin",
+      "name": "MyNaksh Daily Check-in & Sunburst",
+      "appSource": "MyNaksh (ScreenRecording 11-05 11:20)",
+      "status": "active",
+      "config": {
+        "initialView": "modal",
+        "title": "Daily check-in",
+        "subtitle": "Collect your daily rewards here",
+        "currencySymbol": "₹",
+        "dayRewards": [
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17
+        ],
+        "activeDay": 1,
+        "highlightColor": "#F59E0B",
+        "ctaColor": "#0E6B38",
+        "ctaText": "Claim Today's Reward",
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 3290,
+        "claims": 2481,
+        "conversionRate": "75.4%"
+      }
+    },
+    {
+      "id": "instaastro_points_03",
+      "type": "instaastro_points",
+      "name": "InstaAstro Points & 7-Day Stepper",
+      "appSource": "InstaAstro (ScreenRecording 11-05 11:21)",
+      "status": "active",
+      "config": {
+        "initialView": "hub",
+        "startingPoints": 150,
+        "streakBonusPoints": 70,
+        "accentColor": "#FFC700",
+        "progressColor": "#22C55E",
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 4180,
+        "claims": 3123,
+        "conversionRate": "74.7%"
+      }
+    },
+    {
+      "id": "paytm_chest_04",
+      "type": "paytm_chest_scratch",
+      "name": "Paytm Card-to-Chest Coin Odometer",
+      "appSource": "Paytm Cashback (ScreenRecording 11-10 pt1)",
+      "status": "active",
+      "config": {
+        "cardTheme": "maroon",
+        "startingCoins": 135,
+        "rewardCoins": 31,
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 6890,
+        "claims": 5941,
+        "conversionRate": "86.2%"
+      }
+    },
+    {
+      "id": "paytm_spin_05",
+      "type": "paytm_spin_win",
+      "name": "Paytm Spin & Win + Starburst",
+      "appSource": "Paytm Cashback (ScreenRecording 11-10 pt2)",
+      "status": "active",
+      "config": {
+        "spinsLeft": 3,
+        "starburstColor": "#FFC800",
+        "slices": [
+          {
+            "label": "Flat ₹5 Cashback",
+            "color": "#0F3D99",
+            "icon": "🎁"
+          },
+          {
+            "label": "₹100 Off Deal",
+            "color": "#00B9F5",
+            "icon": "🎧"
+          },
+          {
+            "label": "4 at Rs. 549",
+            "color": "#062463",
+            "icon": "👟"
+          },
+          {
+            "label": "30 Days Free Pro",
+            "color": "#1E88E5",
+            "icon": "🎵"
+          }
+        ],
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 7450,
+        "claims": 6322,
+        "conversionRate": "84.9%"
+      }
+    },
+    {
+      "id": "duolingo_flow_06",
+      "type": "duolingo_flow",
+      "name": "Duolingo Lesson → Streak → Rare Chest",
+      "appSource": "Duolingo (ScreenRecording 11-05 11:25)",
+      "status": "active",
+      "config": {
+        "startStep": 1,
+        "themeColor": "#58CC02",
+        "xpEarned": 12,
+        "accuracy": 78,
+        "durationText": "0:49",
+        "streakCount": 1,
+        "lottieTier": "gold",
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 9120,
+        "claims": 8141,
+        "conversionRate": "89.3%"
+      }
+    },
+    {
+      "id": "cred_wheel_07",
+      "type": "cred_wheel",
+      "name": "CRED Obsidian Spin Wheel",
+      "appSource": "CRED Luxury Kit",
+      "status": "active",
+      "config": {
+        "bgTone": "#0C0D11",
+        "accentGreen": "#00E599",
+        "goldTone": "#E5B869",
+        "spinCostCoins": 1000,
+        "decelerationDurationMs": 3800,
+        "segments": [
+          {
+            "label": "500 COINS",
+            "color": "#161821",
+            "text": "#FFFFFF"
+          },
+          {
+            "label": "₹100 CASH",
+            "color": "#E5B869",
+            "text": "#0C0D11"
+          },
+          {
+            "label": "JACKPOT",
+            "color": "#00E599",
+            "text": "#0C0D11"
+          },
+          {
+            "label": "2X BOOSTER",
+            "color": "#1D212F",
+            "text": "#FFFFFF"
+          },
+          {
+            "label": "MYSTERY",
+            "color": "#2B3144",
+            "text": "#E5B869"
+          },
+          {
+            "label": "5000 COINS",
+            "color": "#161821",
+            "text": "#FFFFFF"
+          }
+        ],
+        "soundEnabled": true
+      },
+      "stats": {
+        "impressions": 4500,
+        "claims": 3911,
+        "conversionRate": "86.9%"
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "evt_1794334084936",
+      "userId": "studio_preview",
+      "event": "zepto_scratch_revealed",
+      "metadata": {
+        "widgetId": "zepto_scratch_01"
+      },
+      "timestamp": "2026-11-10T18:08:04.938Z"
+    },
+    {
+      "id": "evt_1794334086459",
+      "userId": "studio_preview",
+      "event": "zepto_reward_claimed",
+      "metadata": {
+        "widgetId": "zepto_scratch_01"
+      },
+      "timestamp": "2026-11-10T18:08:06.459Z"
+    },
+    {
+      "id": "evt_1794334091926",
+      "userId": "studio_preview",
+      "event": "mynaksh_streak_claimed",
+      "metadata": {
+        "widgetId": "mynaksh_checkin_02",
+        "day": 1,
+        "amount": 5
+      },
+      "timestamp": "2026-11-10T18:08:11.926Z"
+    },
+    {
+      "id": "evt_1794334104318",
+      "userId": "studio_preview",
+      "event": "instaastro_points_earned",
+      "metadata": {
+        "widgetId": "instaastro_points_03",
+        "amount": 50
+      },
+      "timestamp": "2026-11-10T18:08:24.318Z"
+    },
+    {
+      "id": "evt_1794334105654",
+      "userId": "studio_preview",
+      "event": "instaastro_points_earned",
+      "metadata": {
+        "widgetId": "instaastro_points_03",
+        "amount": 30
+      },
+      "timestamp": "2026-11-10T18:08:25.654Z"
+    },
+    {
+      "id": "evt_1794334106698",
+      "userId": "studio_preview",
+      "event": "instaastro_points_earned",
+      "metadata": {
+        "widgetId": "instaastro_points_03",
+        "amount": 10
+      },
+      "timestamp": "2026-11-10T18:08:26.698Z"
+    },
+    {
+      "id": "evt_1794334115484",
+      "userId": "studio_preview",
+      "event": "paytm_chest_opened",
+      "metadata": {
+        "widgetId": "paytm_chest_04",
+        "rewardCoins": 31
+      },
+      "timestamp": "2026-11-10T18:08:35.484Z"
+    },
+    {
+      "id": "evt_1794334123176",
+      "userId": "studio_preview",
+      "event": "paytm_spin_won",
+      "metadata": {
+        "widgetId": "paytm_spin_05",
+        "prize": "4 at Rs. 549"
+      },
+      "timestamp": "2026-11-10T18:08:43.176Z"
+    },
+    {
+      "id": "evt_1794334130203",
+      "userId": "studio_preview",
+      "event": "paytm_spin_won",
+      "metadata": {
+        "widgetId": "paytm_spin_05",
+        "prize": "Flat ₹5 Cashback"
+      },
+      "timestamp": "2026-11-10T18:08:50.203Z"
+    },
+    {
+      "id": "evt_1794334145151",
+      "userId": "studio_preview",
+      "event": "duolingo_flow_completed",
+      "metadata": {
+        "widgetId": "duolingo_flow_06"
+      },
+      "timestamp": "2026-11-10T18:09:05.151Z"
+    },
+    {
+      "id": "evt_1794334157566",
+      "userId": "studio_preview",
+      "event": "cred_wheel_spun",
+      "metadata": {
+        "widgetId": "cred_wheel_07"
+      },
+      "timestamp": "2026-11-10T18:09:17.566Z"
+    }
+  ]
+}

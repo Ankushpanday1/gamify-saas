@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamify SaaS — Trophy.so Alternative with Real App Gamification Mechanics</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="/sdk/sound-engine.js"></script>
+  <script src="/sdk/widgets.js"></script>
+  <style>
+    :root {
+      --bg: #090B11;
+      --sidebar: #10131C;
+      --card: #151926;
+      --border: #232A3D;
+      --accent: #00E599;
+      --accent-hover: #00FFAB;
+      --text-main: #FFFFFF;
+      --text-sub: #94A3B8;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* Sidebar */
+    aside { width: 256px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 14px; flex-shrink: 0; }
+    .brand-wrap { display: flex; align-items: center; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .brand-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00E599, #1CB0F6); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #090B11; }
+    .brand-title { font-size: 16px; font-weight: 800; }
+    .brand-tag { font-size: 10px; background: rgba(0,229,153,0.15); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 4px; }
+    .nav-group-label { font-size: 10px; text-transform: uppercase; color: #64748B; font-weight: 800; letter-spacing: 0.8px; margin: 12px 0 6px 10px; }
+    .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: var(--text-sub); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-bottom: 3px; }
+    .nav-link:hover, .nav-link.active { background: #1B2133; color: #FFF; }
+    .nav-link.active { color: var(--accent); font-weight: 700; }
+
+    .sidebar-api-key { margin-top: auto; background: #171C2B; border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+    .api-key-label { font-size: 10px; color: var(--text-sub); margin-bottom: 4px; display: flex; justify-content: space-between; font-weight: 700; }
+    .api-key-box { font-family: var(--font-mono); font-size: 11px; color: var(--accent); background: #0B0E17; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+
+    /* Main */
+    main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    header { height: 60px; border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(16,19,28,0.8); flex-shrink: 0; }
+    .page-title h2 { font-size: 17px; font-weight: 800; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .hdr-btn { background: #171C2B; border: 1px solid var(--border); color: #CBD5E1; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .hdr-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .content-area { flex: 1; overflow-y: auto; padding: 20px 24px 40px; }
+
+    /* Metrics */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
+    .metric-title { font-size: 11px; color: var(--text-sub); font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .metric-val { font-size: 24px; font-weight: 900; }
+
+    /* Studio Layout */
+    .saas-layout { display: grid; grid-template-columns: 310px 1fr; gap: 20px; min-height: 620px; }
+    .widgets-pane, .studio-pane { background: var(--card); border: 1px solid var(--border); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; }
+    .pane-header { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+    .widgets-list { flex: 1; overflow-y: auto; padding: 10px; }
+
+    .widget-item-btn { width: 100%; background: #11141E; border: 1px solid transparent; border-radius: 12px; padding: 11px 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 11px; margin-bottom: 7px; transition: all 0.15s; }
+    .widget-item-btn:hover { background: #1A2030; }
+    .widget-item-btn.selected { background: #1D2436; border-color: var(--accent); }
+    .widget-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .widget-info h4 { font-size: 12.5px; font-weight: 800; color: #FFF; margin-bottom: 2px; }
+    .widget-info p { font-size: 10.5px; color: var(--text-sub); }
+
+    /* Studio Tabs */
+    .studio-tabs { display: flex; border-bottom: 1px solid var(--border); background: #11141E; padding: 0 12px; justify-content: space-between; align-items: center; }
+    .studio-tab-btn { background: transparent; border: none; padding: 13px 16px; font-size: 12.5px; font-weight: 700; color: var(--text-sub); cursor: pointer; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 7px; }
+    .studio-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .studio-body { flex: 1; display: grid; grid-template-columns: 320px 1fr; overflow: hidden; }
+    .customizer-form { padding: 18px; border-right: 1px solid var(--border); overflow-y: auto; background: #121622; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 10.5px; font-weight: 800; color: #CBD5E1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .form-input { width: 100%; background: #0B0E17; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: #FFF; font-size: 12.5px; outline: none; }
+    .form-input:focus { border-color: var(--accent); }
+    .color-row { display: flex; gap: 8px; align-items: center; }
+    .color-swatch { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; background: none; padding: 0; }
+
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .save-config-btn { flex: 1; height: 42px; background: var(--accent); color: #090B11; border: none; border-radius: 8px; font-weight: 900; font-size: 12.5px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .save-config-btn:hover { background: var(--accent-hover); }
+    .reset-config-btn { height: 42px; padding: 0 12px; background: #1E2435; color: #CBD5E1; border: 1px solid var(--border); border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+    .preview-sandbox { background: radial-gradient(circle at 50% 40%, #192033, #0C0F18); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; overflow-y: auto; }
+    .sandbox-badge { position: absolute; top: 12px; left: 16px; font-size: 10.5px; font-weight: 800; color: rgba(255,255,255,0.45); display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
+
+    .embed-drawer { display: none; padding: 24px; overflow-y: auto; grid-column: 1 / -1; background: #0E111A; }
+    .code-box { background: #080A10; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: var(--font-mono); font-size: 12px; line-height: 1.55; color: #E2E8F0; margin-bottom: 18px; position: relative; white-space: pre-wrap; }
+    .copy-btn { position: absolute; top: 10px; right: 10px; background: #1E2538; border: 1px solid var(--border); color: #FFF; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+    /* Events Log Drawer */
+    .events-panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; }
+    .event-row { display: flex; justify-content: space-between; padding: 10px 12px; background: #10131C; border-radius: 10px; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; }
+  </style>
+</head>
+<body>
+
+  <aside>
+    <div class="brand-wrap">
+      <div class="brand-logo"><i class="fa-solid fa-trophy"></i></div>
+      <div class="brand-title">Gamify<span class="brand-tag">SaaS</span></div>
+    </div>
+
+    <div class="nav-group-label">Platform</div>
+    <div class="nav-link active" id="navStudio" onclick="switchPage('studio', this)"><i class="fa-solid fa-layer-group"></i> Widget Studio</div>
+    <div class="nav-link" id="navEvents" onclick="switchPage('events', this)"><i class="fa-solid fa-bolt"></i> Live Event Log</div>
+    <div class="nav-link" onclick="switchStudioTab('embed')"><i class="fa-solid fa-code"></i> Embed SDK</div>
+
+    <div class="nav-group-label">Screen-Recorded Kits</div>
+    <div class="nav-link" onclick="selectWidget('zepto_scratch_01')"><i class="fa-solid fa-wand-magic-sparkles" style="color:#DF7DFF;"></i> Zepto Scratch</div>
+    <div class="nav-link" onclick="selectWidget('mynaksh_checkin_02')"><i class="fa-solid fa-coins" style="color:#F59E0B;"></i> MyNaksh Streak</div>
+    <div class="nav-link" onclick="selectWidget('instaastro_points_03')"><i class="fa-solid fa-star" style="color:#FFC700;"></i> InstaAstro Points</div>
+    <div class="nav-link" onclick="selectWidget('paytm_chest_04')"><i class="fa-solid fa-treasure-chest" style="color:#00B9F5;"></i> Paytm Chest Flip</div>
+    <div class="nav-link" onclick="selectWidget('paytm_spin_05')"><i class="fa-solid fa-dharmachakra" style="color:#38BDF8;"></i> Paytm Spin &amp; Win</div>
+    <div class="nav-link" onclick="selectWidget('duolingo_flow_06')"><i class="fa-solid fa-feather-pointed" style="color:#58CC02;"></i> Duolingo Flow</div>
+    <div class="nav-link" onclick="selectWidget('cred_wheel_07')"><i class="fa-solid fa-gem" style="color:#E5B869;"></i> CRED Luxury Wheel</div>
+
+    <div class="sidebar-api-key">
+      <div class="api-key-label"><span>API KEY</span><span style="color:#00E599;">LIVE</span></div>
+      <div class="api-key-box" onclick="copyText('pk_live_duo_9821')">pk_live_duo_9821</div>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="page-title"><h2>Trophy.so-Style Gamification Studio (1:1 Screen Recording Faithful)</h2></div>
+      <div class="header-actions">
+        <button class="hdr-btn" id="globalMuteBtn" onclick="toggleGlobalSound()">
+          <i class="fa-solid fa-volume-high" style="color:#00E599;"></i> Sound: ON
+        </button>
+        <button class="hdr-btn" onclick="switchStudioTab('embed')">
+          <i class="fa-solid fa-code"></i> Get 1-Line Embed
+        </button>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- Top Metrics -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-title">IMPRESSIONS <i class="fa-solid fa-eye" style="color:#38BDF8;"></i></div>
+          <div class="metric-val" id="mImpressions">-</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">REWARDS CLAIMED <i class="fa-solid fa-gift" style="color:#58CC02;"></i></div>
+          <div class="metric-val" id="mClaims">-</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">CONVERSION <i class="fa-solid fa-arrow-trend-up" style="color:#00E599;"></i></div>
+          <div class="metric-val" id="mConversion">-</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">RECORDED KITS <i class="fa-solid fa-cubes" style="color:#E5B869;"></i></div>
+          <div class="metric-val" id="mCount">7 Kits</div>
+        </div>
+      </div>
+
+      <!-- Studio View -->
+      <div class="saas-layout" id="studioView">
+        <div class="widgets-pane">
+          <div class="pane-header"><span>Gamification Kits</span><span style="font-size:11px; color:#64748B;">7 Widgets</span></div>
+          <div class="widgets-list" id="widgetsListContainer"></div>
+        </div>
+
+        <div class="studio-pane">
+          <div class="studio-tabs">
+            <div>
+              <button class="studio-tab-btn active" id="tabDesign" onclick="switchStudioTab('design')"><i class="fa-solid fa-sliders"></i> Customize &amp; Test</button>
+              <button class="studio-tab-btn" id="tabEmbed" onclick="switchStudioTab('embed')"><i class="fa-solid fa-code"></i> Embed SDK</button>
+              <button class="studio-tab-btn" id="tabJson" onclick="switchStudioTab('json')"><i class="fa-solid fa-file-code"></i> JSON Schema</button>
+            </div>
+            <span id="saveToast" style="font-size:11px; font-weight:800; color:#00E599; opacity:0; transition:opacity 0.3s;">✓ Saved &amp; Deployed!</span>
+          </div>
+
+          <div class="studio-body">
+            <div class="customizer-form" id="customizerForm"></div>
+
+            <div class="preview-sandbox" id="previewSandbox">
+              <div class="sandbox-badge">
+                <i class="fa-solid fa-circle" style="color:#00E599; font-size:8px;"></i>
+                Interactive Live Preview (Click &amp; Play)
+              </div>
+              <div id="sandboxMount"></div>
+            </div>
+
+            <div class="embed-drawer" id="embedDrawer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events View -->
+      <div class="events-panel" id="eventsView">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3>Live Triggered Gamification Events</h3>
+          <button class="hdr-btn" onclick="refreshStats()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div id="eventsList"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const soundEngine = new window.GamifySoundEngine('');
+    let widgetsData = [];
+    let selectedWidget = null;
+    let activeTab = 'design';
+
+    function toggleGlobalSound() {
+      const muted = !soundEngine.muted;
+      soundEngine.setMuted(muted);
+      const btn = document.getElementById('globalMuteBtn');
+      btn.innerHTML = muted
+        ? '<i class="fa-solid fa-volume-xmark" style="color:#FF4B4B;"></i> Sound: OFF'
+        : '<i class="fa-solid fa-volume-high" style="color:#00E599;"></i> Sound: ON';
+    }
+
+    async function loadWidgets() {
+      const res = await fetch('/api/v1/widgets');
+      const json = await res.json();
+      widgetsData = json.widgets || [];
+      renderWidgetsList();
+      if (widgetsData.length && !selectedWidget) selectWidget(widgetsData[0].id);
+      refreshStats();
+    }
+
+    async function refreshStats() {
+      const res = await fetch('/api/v1/stats');
+      const json = await res.json();
+      if (!json.success) return;
+      document.getElementById('mImpressions').innerText = json.stats.totalImpressions.toLocaleString();
+      document.getElementById('mClaims').innerText = json.stats.totalClaims.toLocaleString();
+      document.getElementById('mConversion').innerText = json.stats.avgConversion;
+      document.getElementById('mCount').innerText = json.stats.totalWidgets + ' Kits';
+
+      const evBox = document.getElementById('eventsList');
+      const evs = (json.stats.recentEvents || []).slice().reverse();
+      evBox.innerHTML = evs.length
+        ? evs.map(e => `<div class="event-row"><span><b style="color:#00E599;">${e.event}</b> &bull; ${JSON.stringify(e.metadata || {})}</span><span style="color:#64748B;">${new Date(e.timestamp).toLocaleTimeString()}</span></div>`).join('')
+        : '<div style="color:#64748B; font-size:13px;">Interact with any widget in the Studio Sandbox to record live telemetry events here.</div>';
+    }
+
+    function renderWidgetsList() {
+      const iconMap = {
+        zepto_scratch: ['fa-wand-magic-sparkles', 'rgba(223,125,255,0.16)', '#DF7DFF'],
+        mynaksh_checkin: ['fa-coins', 'rgba(245,158,11,0.16)', '#F59E0B'],
+        instaastro_points: ['fa-star', 'rgba(255,199,0,0.16)', '#FFC700'],
+        paytm_chest_scratch: ['fa-box-open', 'rgba(0,185,245,0.16)', '#00B9F5'],
+        paytm_spin_win: ['fa-dharmachakra', 'rgba(56,189,248,0.16)', '#38BDF8'],
+        duolingo_flow: ['fa-feather-pointed', 'rgba(88,204,2,0.16)', '#58CC02'],
+        cred_wheel: ['fa-gem', 'rgba(229,184,105,0.16)', '#E5B869']
+      };
+      document.getElementById('widgetsListContainer').innerHTML = widgetsData.map(w => {
+        const [ic, bg, col] = iconMap[w.type] || ['fa-gift', '#222', '#FFF'];
+        const sel = selectedWidget && selectedWidget.id === w.id;
+        return `
+          <button class="widget-item-btn ${sel ? 'selected' : ''}" onclick="selectWidget('${w.id}')">
+            <div class="widget-icon" style="background:${bg}; color:${col};"><i class="fa-solid ${ic}"></i></div>
+            <div class="widget-info">
+              <h4>${w.name}</h4>
+              <p>${w.appSource}</p>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectWidget(id) {
+      selectedWidget = widgetsData.find(w => w.id === id);
+      if (!selectedWidget) return;
+      renderWidgetsList();
+      renderCustomizerForm();
+      renderPreview();
+      if (activeTab !== 'design') renderEmbedOrJson();
+    }
+
+    // Dynamic Customizer Form Generator for ALL 7 widgets
+    function fieldInput(key, label, val, type = 'text') {
+      if (type === 'color') {
+        return `
+          <div class="form-group">
+            <label>${label}</label>
+            <div class="color-row">
+              <input type="color" class="color-swatch liveCfg" data-key="${key}" value="${val}">
+              <input type="text" class="form-input liveCfgText" data-key="${key}" value="${val}">
+            </div>
+          </div>`;
+      }
+      if (type === 'boolean') {
+        return `
+          <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="margin:0;">${label}</label>
+            <input type="checkbox" class="liveCfgBool" data-key="${key}" ${val !== false ? 'checked' : ''} style="width:18px; height:18px; accent-color:#00E599; cursor:pointer;">
+          </div>`;
+      }
+      return `
+        <div class="form-group">
+          <label>${label}</label>
+          <input type="${type}" class="form-input liveCfg" data-key="${key}" value="${val}">
+        </div>`;
+    }
+
+    function fieldSelect(key, label, val, options) {
+      return `
+        <div class="form-group">
+          <label>${label}</label>
+          <select class="form-input liveCfg" data-key="${key}">
+            ${options.map(([v, t]) => `<option value="${v}" ${val === v ? 'selected' : ''}>${t}</option>`).join('')}
+          </select>
+        </div>`;
+    }
+
+    function renderCustomizerForm() {
+      const w = selectedWidget;
+      const c = w.config;
+      let fields = `<h3 style="font-size:13.5px; font-weight:800; margin-bottom:14px;">Customize ${w.name}</h3>`;
+
+      if (w.type === 'zepto_scratch') {
+        fields += fieldInput('headerEyebrow', 'Eyebrow Heading', c.headerEyebrow);
+        fields += fieldInput('headerTitle', 'Main Title', c.headerTitle);
+        fields += fieldInput('brandWatermark', 'Foil Watermark Text', c.brandWatermark);
+        fields += fieldInput('foilTopColor', 'Foil Gradient Top', c.foilTopColor, 'color');
+        fields += fieldInput('foilBottomColor', 'Foil Gradient Bottom', c.foilBottomColor, 'color');
+        fields += fieldInput('brandBadge', 'Reward Brand Badge', c.brandBadge);
+        fields += fieldInput('rewardTitle', 'Reward Title', c.rewardTitle);
+        fields += fieldInput('rewardSubtitle', 'Reward Subtitle', c.rewardSubtitle);
+        fields += fieldInput('couponCode', 'Promo / Coupon Text', c.couponCode);
+        fields += fieldInput('ctaText', 'CTA Button Text', c.ctaText);
+        fields += fieldInput('ctaColor', 'CTA Button Color', c.ctaColor, 'color');
+        fields += fieldInput('scratchThresholdPercent', 'Reveal Threshold %', c.scratchThresholdPercent, 'number');
+      } else if (w.type === 'mynaksh_checkin') {
+        fields += fieldSelect('initialView', 'Preview Stage', c.initialView, [['modal', 'Check-in Bottom Sheet'], ['celebrate', 'Golden Sunburst Overlay'], ['rewards_hub', 'Dark Streak Rewards Hub']]);
+        fields += fieldInput('title', 'Header Title', c.title);
+        fields += fieldInput('subtitle', 'Subtitle', c.subtitle);
+        fields += fieldInput('currencySymbol', 'Currency / Coin Symbol', c.currencySymbol);
+        fields += fieldInput('activeDay', 'Active Day (1-7)', c.activeDay, 'number');
+        fields += fieldInput('dayRewardsCsv', '7-Day Rewards (comma separated)', (c.dayRewards || []).join(','));
+        fields += fieldInput('highlightColor', 'Active Day Border', c.highlightColor, 'color');
+        fields += fieldInput('ctaColor', 'Primary Button Color', c.ctaColor, 'color');
+        fields += fieldInput('ctaText', 'Button Text', c.ctaText);
+      } else if (w.type === 'instaastro_points') {
+        fields += fieldSelect('initialView', 'Preview Mode', c.initialView, [['hub', 'Points Hub & Milestone Track'], ['stepper', '7-Day Streak Stepper Sheet']]);
+        fields += fieldInput('startingPoints', 'Starting Points', c.startingPoints, 'number');
+        fields += fieldInput('streakBonusPoints', 'Streak Modal Bonus (+)', c.streakBonusPoints, 'number');
+        fields += fieldInput('accentColor', 'Brand Yellow Accent', c.accentColor, 'color');
+        fields += fieldInput('progressColor', 'Stepper Progress Fill', c.progressColor, 'color');
+      } else if (w.type === 'paytm_chest_scratch') {
+        fields += fieldSelect('cardTheme', 'Scratch Card Design', c.cardTheme, [['maroon', 'Royal Maroon Elephant'], ['teal', 'Blue-Teal Lotus']]);
+        fields += fieldInput('startingCoins', 'Starting Odometer Coins', c.startingCoins, 'number');
+        fields += fieldInput('rewardCoins', 'Reward Coins Won', c.rewardCoins, 'number');
+      } else if (w.type === 'paytm_spin_win') {
+        fields += fieldInput('spinsLeft', 'Initial Spins Left', c.spinsLeft, 'number');
+        fields += fieldInput('starburstColor', 'Starburst Explosion Color', c.starburstColor, 'color');
+      } else if (w.type === 'duolingo_flow') {
+        fields += fieldSelect('startStep', 'Jump to Stage', String(c.startStep), [['1', 'Stage 1: Lesson Complete'], ['2', 'Stage 2: Ignite Streak'], ['3', 'Stage 3: Streak Goal'], ['4', 'Stage 4: Rare Chest -> x3 XP']]);
+        fields += fieldInput('themeColor', 'Brand Owl Green', c.themeColor, 'color');
+        fields += fieldInput('xpEarned', 'Total XP', c.xpEarned, 'number');
+        fields += fieldInput('accuracy', 'Accuracy %', c.accuracy, 'number');
+        fields += fieldInput('durationText', 'Duration Time', c.durationText);
+        fields += fieldInput('streakCount', 'Streak Day Count', c.streakCount, 'number');
+        fields += fieldSelect('lottieTier', 'Rare Chest Tier', c.lottieTier, [['gold', 'Gold Rare Chest'], ['silver', 'Silver Chest'], ['bronze', 'Bronze Chest']]);
+      } else if (w.type === 'cred_wheel') {
+        fields += fieldInput('bgTone', 'Obsidian Background', c.bgTone, 'color');
+        fields += fieldInput('accentGreen', 'Accent Neon Green', c.accentGreen, 'color');
+        fields += fieldInput('goldTone', 'Brushed Gold Rim', c.goldTone, 'color');
+        fields += fieldInput('spinCostCoins', 'Spin Cost (CRED Coins)', c.spinCostCoins, 'number');
+      }
+
+      fields += fieldInput('soundEnabled', 'Enable Sound Effects', c.soundEnabled, 'boolean');
+      fields += `
+        <div class="btn-row">
+          <button class="save-config-btn" onclick="saveCurrentWidget()"><i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Deploy</button>
+          <button class="reset-config-btn" onclick="resetCurrentWidget()" title="Reset to Recording Default"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      `;
+
+      const form = document.getElementById('customizerForm');
+      form.innerHTML = fields;
+
+      // Live bindings
+      form.querySelectorAll('.liveCfg').forEach(inp => {
+        inp.oninput = () => {
+          const k = inp.getAttribute('data-key');
+          if (k === 'dayRewardsCsv') {
+            selectedWidget.config.dayRewards = inp.value.split(',').map(x => Number(x.trim()) || 0).slice(0, 7);
+          } else {
+            selectedWidget.config[k] = inp.type === 'number' ? Number(inp.value) : inp.value;
+          }
+          const sibling = form.querySelector(`.liveCfgText[data-key="${k}"]`);
+          if (sibling) sibling.value = inp.value;
+          renderPreview();
+        };
+      });
+      form.querySelectorAll('.liveCfgText').forEach(inp => {
+        inp.oninput = () => {
+          const k = inp.getAttribute('data-key');
+          selectedWidget.config[k] = inp.value;
+          const sibling = form.querySelector(`.liveCfg[data-key="${k}"]`);
+          if (sibling && /^#[0-9A-F]{6}$/i.test(inp.value)) sibling.value = inp.value;
+          renderPreview();
+        };
+      });
+      form.querySelectorAll('.liveCfgBool').forEach(inp => {
+        inp.onchange = () => {
+          selectedWidget.config[inp.getAttribute('data-key')] = inp.checked;
+          renderPreview();
+        };
+      });
+    }
+
+    function renderPreview() {
+      const mount = document.getElementById('sandboxMount');
+      window.GamifyWidgets.render(mount, selectedWidget, {
+        sound: soundEngine,
+        onEvent: (eventName, metadata) => {
+          fetch('/api/v1/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: 'studio_preview', event: eventName, metadata })
+          }).then(() => refreshStats());
+        }
+      });
+    }
+
+    async function saveCurrentWidget() {
+      const res = await fetch(`/api/v1/widgets/${selectedWidget.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: selectedWidget.config })
+      });
+      const json = await res.json();
+      if (json.success) {
+        const toast = document.getElementById('saveToast');
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+        confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
+      }
+    }
+
+    async function resetCurrentWidget() {
+      const res = await fetch(`/api/v1/widgets/${selectedWidget.id}/reset`, { method: 'POST' });
+      const json = await res.json();
+      if (json.success) {
+        const idx = widgetsData.findIndex(w => w.id === selectedWidget.id);
+        widgetsData[idx] = json.widget;
+        selectedWidget = json.widget;
+        renderCustomizerForm();
+        renderPreview();
+      }
+    }
+
+    function switchStudioTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+      const form = document.getElementById('customizerForm');
+      const prev = document.getElementById('previewSandbox');
+      const draw = document.getElementById('embedDrawer');
+
+      if (tab === 'design') {
+        form.style.display = 'block';
+        prev.style.display = 'flex';
+        draw.style.display = 'none';
+      } else {
+        form.style.display = 'none';
+        prev.style.display = 'none';
+        draw.style.display = 'block';
+        renderEmbedOrJson();
+      }
+    }
+
+    function renderEmbedOrJson() {
+      const draw = document.getElementById('embedDrawer');
+      const w = selectedWidget;
+      if (activeTab === 'embed') {
+        draw.innerHTML = `
+          <h3 style="font-size:15px; margin-bottom:12px;">Embed "${w.name}" Anywhere in 2 Lines</h3>
+          <div style="font-size:12px; color:#94A3B8; margin-bottom:6px;">1. Inline Embed (Vanilla JS / Next.js / Shopify / Webflow)</div>
+          <div class="code-box"><button class="copy-btn" onclick="copyText(this.nextElementSibling.innerText)">Copy</button><code>&lt;div id="gamify-slot"&gt;&lt;/div&gt;
+&lt;script src="http://localhost:4000/sdk/gamify.js" data-api-key="pk_live_duo_9821"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const gamify = new Gamify();
+  gamify.identify('user_123', { plan: 'pro' });
+  gamify.mount('#gamify-slot', '${w.id}');
+&lt;/script&gt;</code></div>
+
+          <div style="font-size:12px; color:#94A3B8; margin-bottom:6px;">2. Trigger as Popup Modal with Runtime Overrides</div>
+          <div class="code-box"><button class="copy-btn" onclick="copyText(this.nextElementSibling.innerText)">Copy</button><code>gamify.launchModal('${w.id}', ${JSON.stringify(w.config, null, 2)});</code></div>
+        `;
+      } else {
+        draw.innerHTML = `
+          <h3 style="font-size:15px; margin-bottom:12px;">Live REST Schema (GET /api/v1/widgets/${w.id})</h3>
+          <div class="code-box"><button class="copy-btn" onclick="copyText(this.nextElementSibling.innerText)">Copy</button><code>${JSON.stringify(w, null, 2)}</code></div>
+        `;
+      }
+    }
+
+    function switchPage(page, el) {
+      document.querySelectorAll('aside .nav-link').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('studioView').style.display = page === 'studio' ? 'grid' : 'none';
+      document.getElementById('eventsView').style.display = page === 'events' ? 'block' : 'none';
+      if (page === 'events') refreshStats();
+    }
+
+    function copyText(str) {
+      navigator.clipboard.writeText(str);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadWidgets);
+  </script>
+</body>
+</html>
