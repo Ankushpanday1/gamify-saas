@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="/sdk/sound-engine.js"></script>
+  <script src="/sdk/stickers.js"></script>
   <script src="/sdk/widgets.js"></script>
   <style>
     :root {
@@ -113,13 +114,19 @@
     <div class="nav-link" onclick="switchStudioTab('embed')"><i class="fa-solid fa-code"></i> Embed SDK</div>
 
     <div class="nav-group-label">Screen-Recorded Kits</div>
+    <div class="nav-link" onclick="selectWidget('cred_slot_09')"><i class="fa-solid fa-dice" style="color:#F59E0B;"></i> CRED Slot Machine <span style="background:#F59E0B; color:#0F172A; font-size:9px; font-weight:800; padding:1px 5px; border-radius:4px; margin-left:auto;">NEW</span></div>
+    <div class="nav-link" onclick="selectWidget('cred_wheel_07')"><i class="fa-solid fa-gem" style="color:#E5B869;"></i> CRED Luxury Wheel</div>
+    <div class="nav-link" onclick="selectWidget('gamify_mynaksh_06')"><i class="fa-solid fa-coins" style="color:#F59E0B;"></i> MyNaksh 1:1 Streaks</div>
+    <div class="nav-link" onclick="selectWidget('gamify_leaderboard_08')"><i class="fa-solid fa-ranking-star" style="color:#00B9F5;"></i> Triple Podium Ranks</div>
     <div class="nav-link" onclick="selectWidget('zepto_scratch_01')"><i class="fa-solid fa-wand-magic-sparkles" style="color:#DF7DFF;"></i> Zepto Scratch</div>
-    <div class="nav-link" onclick="selectWidget('mynaksh_checkin_02')"><i class="fa-solid fa-coins" style="color:#F59E0B;"></i> MyNaksh Streak</div>
-    <div class="nav-link" onclick="selectWidget('instaastro_points_03')"><i class="fa-solid fa-star" style="color:#FFC700;"></i> InstaAstro Points</div>
+    <div class="nav-link" onclick="selectWidget('duolingo_flow_06')"><i class="fa-solid fa-feather-pointed" style="color:#58CC02;"></i> Duolingo Flow</div>
     <div class="nav-link" onclick="selectWidget('paytm_chest_04')"><i class="fa-solid fa-treasure-chest" style="color:#00B9F5;"></i> Paytm Chest Flip</div>
     <div class="nav-link" onclick="selectWidget('paytm_spin_05')"><i class="fa-solid fa-dharmachakra" style="color:#38BDF8;"></i> Paytm Spin &amp; Win</div>
-    <div class="nav-link" onclick="selectWidget('duolingo_flow_06')"><i class="fa-solid fa-feather-pointed" style="color:#58CC02;"></i> Duolingo Flow</div>
-    <div class="nav-link" onclick="selectWidget('cred_wheel_07')"><i class="fa-solid fa-gem" style="color:#E5B869;"></i> CRED Luxury Wheel</div>
+    <div class="nav-link" onclick="selectWidget('instaastro_points_03')"><i class="fa-solid fa-star" style="color:#FFC700;"></i> InstaAstro Points</div>
+
+    <div class="nav-group-label">Live Playground &amp; Rewards</div>
+    <div class="nav-link" onclick="window.location.href='/live'"><i class="fa-solid fa-gamepad" style="color:#EC4899;"></i> Live PlayZone App <span style="background:#EC4899; color:#fff; font-size:9px; font-weight:800; padding:1px 5px; border-radius:4px; margin-left:auto;">HOT</span></div>
+    <div class="nav-link" onclick="window.GamifyStickers && window.GamifyStickers.openAlbum()"><i class="fa-solid fa-book-bookmark" style="color:#8B5CF6;"></i> Sticker Album (15)</div>
 
     <div class="sidebar-api-key">
       <div class="api-key-label"><span>API KEY</span><span style="color:#00E599;">LIVE</span></div>

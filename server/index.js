@@ -266,6 +266,34 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (pathname === '/api/v1/stickers' && req.method === 'GET') {
+      const manifestPath = path.join(PUBLIC_DIR, 'assets', 'stickers', 'stickers_manifest.json');
+      let stickers = [];
+      if (fs.existsSync(manifestPath)) {
+        try { stickers = JSON.parse(fs.readFileSync(manifestPath, 'utf8')); } catch (e) {}
+      }
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, count: stickers.length, stickers }));
+      return;
+    }
+
+    if (pathname === '/api/v1/stickers/unlock' && req.method === 'POST') {
+      const body = await parseJsonBody(req);
+      const ev = {
+        id: 'evt_stk_' + Date.now(),
+        event: 'sticker_unlocked',
+        userId: body.userId || 'demo_user',
+        stickerId: body.stickerId,
+        timestamp: new Date().toISOString()
+      };
+      DB.events.push(ev);
+      if (DB.events.length > 200) DB.events.shift();
+      saveDB(DB);
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, event: ev }));
+      return;
+    }
+
     const resetMatch = pathname.match(/^\/api\/v1\/widgets\/([a-zA-Z0-9_-]+)\/reset$/);
     if (resetMatch && req.method === 'POST') {
       const def = getDefaultWidgets().find(w => w.id === resetMatch[1]);
@@ -366,6 +394,8 @@ const server = http.createServer(async (req, res) => {
 
   let reqPath = decodeURI(pathname);
   if (reqPath === '/' || reqPath === '/dashboard') reqPath = '/index.html';
+  if (reqPath === '/live' || reqPath === '/showcase' || reqPath === '/app') reqPath = '/live.html';
+  if (reqPath === '/demo') reqPath = '/embed-demo.html';
 
   const filePath = path.join(PUBLIC_DIR, reqPath);
   if (!filePath.startsWith(PUBLIC_DIR)) {
