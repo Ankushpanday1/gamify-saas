@@ -334,15 +334,17 @@
         fields += fieldInput('ctaColor', 'CTA Button Color', c.ctaColor, 'color');
         fields += fieldInput('scratchThresholdPercent', 'Reveal Threshold %', c.scratchThresholdPercent, 'number');
       } else if (w.type === 'mynaksh_checkin') {
-        fields += fieldSelect('initialView', 'Preview Stage', c.initialView, [['modal', 'Check-in Bottom Sheet'], ['celebrate', 'Golden Sunburst Overlay'], ['rewards_hub', 'Dark Streak Rewards Hub']]);
-        fields += fieldInput('title', 'Header Title', c.title);
-        fields += fieldInput('subtitle', 'Subtitle', c.subtitle);
-        fields += fieldInput('currencySymbol', 'Currency / Coin Symbol', c.currencySymbol);
-        fields += fieldInput('activeDay', 'Active Day (1-7)', c.activeDay, 'number');
+        fields += fieldSelect('initialView', 'Preview Screen', c.initialView, [['rewards_hub', 'Full Rewards Hub (1:1 Screenshot)'], ['celebrate', 'Golden Sunburst Celebration'], ['modal', 'Check-in Bottom Sheet']]);
+        fields += fieldInput('walletBalance', 'Wallet Balance (₹)', c.walletBalance, 'number');
+        fields += fieldInput('activeDay', 'Active Streak Day (1-7)', c.activeDay, 'number');
         fields += fieldInput('dayRewardsCsv', '7-Day Rewards (comma separated)', (c.dayRewards || []).join(','));
-        fields += fieldInput('highlightColor', 'Active Day Border', c.highlightColor, 'color');
-        fields += fieldInput('ctaColor', 'Primary Button Color', c.ctaColor, 'color');
-        fields += fieldInput('ctaText', 'Button Text', c.ctaText);
+        fields += fieldInput('referralBonus', 'Referral Bonus (₹)', c.referralBonus, 'number');
+        fields += fieldInput('referralCode', 'Referral Code', c.referralCode);
+        fields += fieldInput('mantraName', 'Mantra Card Title', c.mantraName);
+        fields += fieldInput('mantraChant', 'Mantra Chant Text', c.mantraChant);
+        fields += fieldInput('mantraReward', 'Mantra Reward (₹)', c.mantraReward, 'number');
+        fields += fieldInput('highlightColor', 'Active Neon Border', c.highlightColor, 'color');
+        fields += fieldInput('ctaColor', 'WhatsApp Button Color', c.ctaColor, 'color');
       } else if (w.type === 'instaastro_points') {
         fields += fieldSelect('initialView', 'Preview Mode', c.initialView, [['hub', 'Points Hub & Milestone Track'], ['stepper', '7-Day Streak Stepper Sheet']]);
         fields += fieldInput('startingPoints', 'Starting Points', c.startingPoints, 'number');

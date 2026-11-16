@@ -39,14 +39,15 @@
     {
       "id": "mynaksh_checkin_02",
       "type": "mynaksh_checkin",
-      "name": "MyNaksh Daily Check-in & Sunburst",
-      "appSource": "MyNaksh (ScreenRecording 11-05 11:20)",
+      "name": "MyNaksh Daily Streak & Rewards Hub",
+      "appSource": "MyNaksh (ScreenRecording 11-05 & Native App)",
       "status": "active",
       "config": {
-        "initialView": "modal",
-        "title": "Daily check-in",
+        "initialView": "rewards_hub",
+        "title": "Keep Your Streak Alive!",
         "subtitle": "Collect your daily rewards here",
         "currencySymbol": "₹",
+        "walletBalance": 30,
         "dayRewards": [
           5,
           7,
@@ -57,9 +58,14 @@
           17
         ],
         "activeDay": 1,
-        "highlightColor": "#F59E0B",
-        "ctaColor": "#0E6B38",
-        "ctaText": "Claim Today's Reward",
+        "referralBonus": 50,
+        "referralCode": "R8HKBD",
+        "mantraName": "Mars Mantra",
+        "mantraChant": "Om Am Angarakaya Namah",
+        "mantraReward": 1,
+        "highlightColor": "#22C55E",
+        "ctaColor": "#16A34A",
+        "ctaText": "Refer a friend",
         "soundEnabled": true
       },
       "stats": {

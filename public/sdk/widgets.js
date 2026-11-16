@@ -251,115 +251,47 @@
   }
 
   // =========================================================================
-  // 2. MYNAKSH DAILY CHECK-IN & CELEBRATION (ScreenRecording_11-05-2026 11-20-22_1.mp4)
+  // 2. MYNAKSH DAILY CHECK-IN & REWARDS HUB (1:1 with Screenshot & Recording)
   // =========================================================================
   function renderMynakshCheckin(mount, widget, ctx) {
     const c = widget.config;
     const snd = ctx.sound;
     const cur = c.currencySymbol || '₹';
     const rewards = Array.isArray(c.dayRewards) ? c.dayRewards : [5, 7, 9, 11, 13, 15, 17];
-    const activeDay = Math.min(Math.max(1, Number(c.activeDay || 1)), 7);
-    let viewState = c.initialView || 'modal'; // 'modal' | 'celebrate' | 'rewards_hub'
+    let activeDay = Math.min(Math.max(1, Number(c.activeDay || 1)), 7);
+    let walletBalance = Number(c.walletBalance || 30);
+    let mantraClaimed = false;
+    let viewState = c.initialView || 'rewards_hub'; // 'rewards_hub' | 'celebrate' | 'modal'
 
     function renderView() {
-      if (viewState === 'modal') {
-        const makeDayBox = (idx) => {
-          const dayNum = idx + 1;
-          const isDone = dayNum < activeDay;
-          const isToday = dayNum === activeDay;
-          const amt = rewards[idx] ?? 5;
-          const border = isToday ? `2px solid ${c.highlightColor || '#F59E0B'}` : '1px solid #EAE5DC';
-          const bg = isToday ? '#FFF9EC' : '#F8F6F2';
-          const coinBg = isToday
-            ? 'linear-gradient(135deg, #FBBF24, #D97706)'
-            : isDone
-            ? '#10B981'
-            : '#CBD5E1';
-          const coinSym = isDone ? '✓' : '+';
-          return `
-            <div style="background: ${bg}; border: ${border}; border-radius: 14px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-              <span style="font-size: 11px; color: #64748B; font-weight: 600;">Day ${dayNum}</span>
-              <span style="font-size: 14px; font-weight: 800; color: #1E293B;">${cur}${amt}</span>
-              <div style="width: 24px; height: 24px; border-radius: 50%; background: ${coinBg}; color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; box-shadow: 0 2px 6px rgba(0,0,0,0.12);">${coinSym}</div>
-            </div>
-          `;
-        };
-
-        mount.innerHTML = `
-          <div class="gw-phone-frame" style="background: #EFE9DF; justify-content: flex-end;">
-            <button class="gw-replay-chip" id="mnSwitchHub">Hub View</button>
-            <!-- Dimmed app background -->
-            <div style="padding: 18px 18px 0; opacity: 0.45;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                <span style="font-size: 15px; font-weight: 800; color: #1E1B18;">Namaste Ankush</span>
-                <span style="background: #1C1917; color: #FFF; padding: 4px 10px; border-radius: 14px; font-size: 11px; font-weight: 700;">Wallet ${cur}20 +</span>
-              </div>
-              <div style="height: 60px; background: #141210; border-radius: 14px;"></div>
-            </div>
-
-            <!-- White Rounded Bottom Sheet -->
-            <div style="background: #FFFFFF; border-radius: 26px 26px 0 0; padding: 20px 18px 22px; box-shadow: 0 -10px 40px rgba(0,0,0,0.18);">
-              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FCD34D, #D97706); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
-                  <span style="font-size: 18px; color: #FFF; font-weight: 900;">${cur}</span>
-                </div>
-                <div>
-                  <div style="font-size: 17px; font-weight: 800; color: #111827;">${c.title || 'Daily check-in'}</div>
-                  <div style="font-size: 12px; color: #6B7280;">${c.subtitle || 'Collect your daily rewards here'}</div>
-                </div>
-              </div>
-
-              <!-- Row 1: Days 1-4 -->
-              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px;">
-                ${[0, 1, 2, 3].map(makeDayBox).join('')}
-              </div>
-              <!-- Row 2: Days 5-7 Centered -->
-              <div style="display: grid; grid-template-columns: repeat(3, 72px); justify-content: center; gap: 8px; margin-bottom: 18px;">
-                ${[4, 5, 6].map(makeDayBox).join('')}
-              </div>
-
-              <button id="mnClaimBtn" class="gw-btn-press" style="width: 100%; height: 48px; border-radius: 24px; border: none; background: ${c.ctaColor || '#0E6B38'}; color: #FFFFFF; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(14, 107, 56, 0.35);">
-                ${c.ctaText || "Claim Today's Reward"}
-              </button>
-            </div>
-          </div>
-        `;
-
-        mount.querySelector('#mnClaimBtn').onclick = () => {
-          if (c.soundEnabled !== false) snd.playCoinCascade(6);
-          viewState = 'celebrate';
-          renderView();
-          fireConfetti(['#FBBF24', '#0E6B38', '#FFFFFF']);
-          ctx.emit('mynaksh_streak_claimed', { widgetId: widget.id, day: activeDay, amount: rewards[activeDay - 1] });
-        };
-        mount.querySelector('#mnSwitchHub').onclick = () => { viewState = 'rewards_hub'; renderView(); };
-
-      } else if (viewState === 'celebrate') {
+      if (viewState === 'celebrate') {
         const earned = rewards[activeDay - 1] ?? 5;
         mount.innerHTML = `
-          <div class="gw-phone-frame" style="background: rgba(15, 14, 12, 0.94); justify-content: center; align-items: center; padding: 24px; text-align: center;">
-            <button id="mnCloseCel" style="position: absolute; top: 18px; right: 18px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.16); border: none; color: #FFF; font-size: 16px; cursor: pointer;">&times;</button>
+          <div class="gw-phone-frame" style="background: rgba(8, 11, 20, 0.96); justify-content: center; align-items: center; padding: 24px; text-align: center; position: relative; overflow: hidden;">
+            <button id="mnCloseCel" style="position: absolute; top: 18px; right: 18px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.14); border: none; color: #FFF; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
 
-            <div style="position: relative; width: 150px; height: 150px; margin-bottom: 16px;">
-              <!-- Rotating Golden Sunburst -->
-              <div style="position: absolute; top: 50%; left: 50%; width: 220px; height: 220px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(251, 191, 36, 0.28) 0deg 12deg, transparent 12deg 24deg); -webkit-mask-image: radial-gradient(circle, black 30%, transparent 72%); animation: gwSunburstSpin 14s linear infinite;"></div>
-              <!-- Floating 3D Gold Coin -->
-              <div style="position: relative; z-index: 2; width: 112px; height: 112px; margin: 19px auto; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FEF08A, #F59E0B 60%, #B45309 100%); border: 5px solid #FDE68A; box-shadow: 0 12px 35px rgba(245, 158, 11, 0.65); display: flex; align-items: center; justify-content: center; animation: gwFloatCoin 2.4s ease-in-out infinite;">
-                <span style="font-size: 54px; font-weight: 900; color: #92400E; text-shadow: 0 2px 0 rgba(255,255,255,0.5);">${cur}</span>
+            <div style="position: relative; width: 160px; height: 160px; margin: 0 auto 16px;">
+              <!-- Rotating Golden Sunburst Rays -->
+              <div style="position: absolute; top: -30px; left: -30px; width: 220px; height: 220px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(251, 191, 36, 0.32) 0deg 12deg, transparent 12deg 24deg); -webkit-mask-image: radial-gradient(circle, black 35%, transparent 72%); animation: gwSunburstSpin 14s linear infinite;"></div>
+              
+              <!-- Floating 3D Gold Coin with Glow -->
+              <div style="position: relative; z-index: 2; width: 120px; height: 120px; margin: 20px auto; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FEF08A 0%, #F59E0B 55%, #B45309 100%); border: 5px solid #FDE68A; box-shadow: 0 14px 40px rgba(245, 158, 11, 0.7); display: flex; align-items: center; justify-content: center; animation: gwFloatCoin 2.4s ease-in-out infinite;">
+                <img src="/assets/mynaksh/wincoin.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="width: 100px; height: 100px; object-fit: contain;" alt="Coin" />
+                <span style="display: none; font-size: 58px; font-weight: 900; color: #78350F; text-shadow: 0 2px 0 rgba(255,255,255,0.6);">${cur}</span>
               </div>
             </div>
 
-            <div style="font-size: 22px; font-weight: 900; color: #FFFFFF; margin-bottom: 4px; animation: gwPopIn 0.35s ease;">
+            <div style="font-size: 24px; font-weight: 900; color: #FFFFFF; margin-bottom: 6px; letter-spacing: -0.3px; animation: gwPopIn 0.35s ease;">
               ${activeDay} Day Streak!
             </div>
             <div style="font-size: 16px; font-weight: 800; color: #FACC15; margin-bottom: 8px;">
               You earned ${cur}${earned} today
             </div>
-            <div style="font-size: 12px; color: #CBD5E1; max-width: 240px; line-height: 1.4; margin-bottom: 24px;">
+            <div style="font-size: 12.5px; color: #94A3B8; max-width: 250px; line-height: 1.45; margin: 0 auto 26px;">
               Collect your daily reward and keep your streak going.
             </div>
 
-            <button id="mnOkBtn" class="gw-btn-press" style="width: 140px; height: 42px; border-radius: 21px; border: none; background: rgba(255, 255, 255, 0.22); color: #FFFFFF; font-size: 14px; font-weight: 800; cursor: pointer;">
+            <button id="mnOkBtn" class="gw-btn-press" style="width: 150px; height: 44px; border-radius: 22px; border: none; background: rgba(255, 255, 255, 0.22); color: #FFFFFF; font-size: 14.5px; font-weight: 800; cursor: pointer; transition: background 0.2s;">
               OK
             </button>
           </div>
@@ -373,68 +305,393 @@
         mount.querySelector('#mnOkBtn').onclick = goHub;
         mount.querySelector('#mnCloseCel').onclick = goHub;
 
-      } else {
-        // Dark Rewards Hub ("Keep Your Streak Alive!")
-        const nextAmt = rewards[Math.min(activeDay, 6)] ?? 7;
-        const pills = rewards.map((amt, idx) => {
-          const d = idx + 1;
-          const claimed = d <= activeDay;
+      } else if (viewState === 'modal') {
+        // Bottom Sheet modal view
+        const makeDayBox = (idx) => {
+          const dayNum = idx + 1;
+          const isDone = dayNum < activeDay;
+          const isToday = dayNum === activeDay;
+          const amt = rewards[idx] ?? 5;
+          const border = isToday ? `2px solid ${c.highlightColor || '#22C55E'}` : '1px solid #EAE5DC';
+          const bg = isToday ? '#FFFFFF' : '#F8F6F2';
           return `
-            <div style="flex: 1; background: #1F2127; border: ${claimed ? '1.5px solid #10B981' : '1px solid #2E313B'}; border-radius: 10px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <span style="font-size: 9px; color: #9CA3AF; font-weight: 700;">Day ${d}</span>
-              <span style="font-size: 11px; font-weight: 800; color: #FFF;">${cur}${amt}</span>
-              <div style="width: 18px; height: 18px; border-radius: 50%; background: ${claimed ? '#10B981' : '#3F4451'}; color: #FFF; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900;">${claimed ? '✓' : '+'}</div>
+            <div style="background: ${bg}; border: ${border}; border-radius: 14px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; ${isToday ? 'box-shadow: 0 0 10px rgba(34, 197, 94, 0.35);' : ''}">
+              <span style="font-size: 10.5px; color: #64748B; font-weight: 600;">Day ${dayNum}</span>
+              <span style="font-size: 13.5px; font-weight: 800; color: #1E293B;">${cur}${amt}</span>
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: ${isToday ? 'linear-gradient(135deg, #FBBF24, #D97706)' : isDone ? '#22C55E' : '#CBD5E1'}; color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">${isDone ? '✓' : isToday ? '★' : '+'}</div>
             </div>
           `;
-        }).join('');
+        };
 
         mount.innerHTML = `
-          <div class="gw-phone-frame" style="background: #F6F3EE; padding: 16px; gap: 14px;">
-            <button class="gw-replay-chip" id="mnBackModal"><i class="fa-solid fa-rotate-left"></i> Replay Popup</button>
-
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 18px; font-weight: 900; color: #111827;">Rewards</span>
-              <span style="background: #FFFFFF; border: 1px solid #E5E7EB; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 800; color: #111827;">Wallet ${cur}${20 + (rewards[activeDay - 1] || 5)} +</span>
+          <div class="gw-phone-frame" style="background: #EFE9DF; justify-content: flex-end; position: relative;">
+            <button class="gw-replay-chip" id="mnSwitchHubToPage" style="z-index: 10;"><i class="fa-solid fa-mobile-screen"></i> Rewards Page</button>
+            
+            <div style="padding: 18px 18px 0; opacity: 0.45;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <span style="font-size: 16px; font-weight: 800; color: #1E1B18;">Namaste Ankush</span>
+                <span style="background: #1C1917; color: #FFF; padding: 4px 10px; border-radius: 14px; font-size: 11px; font-weight: 700;">Wallet ${cur}${walletBalance} +</span>
+              </div>
+              <div style="height: 60px; background: #141210; border-radius: 14px;"></div>
             </div>
 
-            <!-- Keep Your Streak Alive Dark Banner -->
-            <div style="background: #141518; border-radius: 18px; padding: 14px; color: #FFF;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #FCD34D, #D97706); display: flex; align-items: center; justify-content: center; font-weight: 900; color: #78350F;">${cur}</div>
+            <!-- White Rounded Bottom Sheet -->
+            <div style="background: #FFFFFF; border-radius: 26px 26px 0 0; padding: 22px 18px 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.22); animation: gwSlideUp 0.35s ease;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FDE047, #F59E0B 60%, #B45309 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); flex-shrink: 0;">
+                  <img src="/assets/mynaksh/dailystreakcardicon.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="width: 30px; height: 30px; object-fit: contain;" />
+                  <span style="display: none; font-size: 20px; color: #FFF; font-weight: 900;">${cur}</span>
+                </div>
                 <div>
-                  <div style="font-size: 14px; font-weight: 800;">Keep Your Streak Alive!</div>
-                  <div style="font-size: 10px; color: #9CA3AF;">Collect your daily rewards here</div>
+                  <div style="font-size: 17px; font-weight: 800; color: #111827;">${c.title || 'Daily check-in'}</div>
+                  <div style="font-size: 12px; color: #6B7280;">${c.subtitle || 'Collect your daily rewards here'}</div>
                 </div>
               </div>
-              <div style="display: flex; gap: 4px; margin-bottom: 10px;">${pills}</div>
-              <div style="background: #1F2229; border-radius: 10px; padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #E5E7EB;">
-                ✨ Get ${cur}${nextAmt} more tomorrow
-              </div>
-            </div>
 
-            <!-- Refer Card -->
-            <div style="background: #FFFBF2; border: 1px solid #F3E8D2; border-radius: 18px; padding: 14px;">
-              <div style="font-size: 14px; font-weight: 800; color: #1F2937;">Refer a friend &amp; both earn ${cur}50</div>
-              <div style="font-size: 11px; color: #0E6B38; margin: 4px 0 10px; font-weight: 600;">How referral works &rsaquo;</div>
-              <button class="gw-btn-press" style="width: 100%; height: 38px; border-radius: 19px; border: none; background: ${c.ctaColor || '#0E6B38'}; color: #FFF; font-size: 12px; font-weight: 800; cursor: pointer;">
-                Refer a friend
+              <!-- Row 1: Days 1-4 -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px;">
+                ${[0, 1, 2, 3].map(makeDayBox).join('')}
+              </div>
+              <!-- Row 2: Days 5-7 Centered -->
+              <div style="display: grid; grid-template-columns: repeat(3, 76px); justify-content: center; gap: 8px; margin-bottom: 20px;">
+                ${[4, 5, 6].map(makeDayBox).join('')}
+              </div>
+
+              <button id="mnClaimModalBtn" class="gw-btn-press" style="width: 100%; height: 48px; border-radius: 24px; border: none; background: ${c.ctaColor || '#0E6B38'}; color: #FFFFFF; font-size: 14.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(14, 107, 56, 0.35);">
+                ${c.ctaText || "Claim Today's Reward"}
               </button>
-              <div style="text-align: center; font-size: 11px; color: #6B7280; margin-top: 8px;">Referral Code: <b style="color:#111827;">R8HKBD</b></div>
-            </div>
-
-            <!-- Mantra Jaap Card -->
-            <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-size: 12px; font-weight: 800; color: #111827;">Mars Mantra</div>
-                <div style="font-size: 10px; color: #6B7280;">Om Am Angarakaya Namah</div>
-              </div>
-              <span style="background: #FEF3C7; color: #B45309; font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 14px;">Claim ${cur}1 &rsaquo;</span>
             </div>
           </div>
         `;
-        mount.querySelector('#mnBackModal').onclick = () => { viewState = 'modal'; renderView(); };
+
+        mount.querySelector('#mnClaimModalBtn').onclick = () => {
+          if (c.soundEnabled !== false) snd.playCoinCascade(6);
+          viewState = 'celebrate';
+          renderView();
+          fireConfetti(['#FBBF24', '#22C55E', '#FFFFFF']);
+          ctx.emit('mynaksh_streak_claimed', { widgetId: widget.id, day: activeDay, amount: rewards[activeDay - 1] });
+        };
+        mount.querySelector('#mnSwitchHubToPage').onclick = () => { viewState = 'rewards_hub'; renderView(); };
+
+      } else {
+        // =====================================================================
+        // FULL 1:1 REWARDS SCREEN (Identical to User Screenshot & Native App)
+        // =====================================================================
+        const nextAmt = rewards[Math.min(activeDay, 6)] ?? 7;
+
+        // Generate 7-Day capsules exactly matching screenshot
+        const dayPills = rewards.map((amt, idx) => {
+          const d = idx + 1;
+          const isClaimedToday = d === 1; // In screenshot Day 1 is claimed with green border
+          const isDay2 = d === 2; // Next upcoming
+          
+          if (isClaimedToday) {
+            return `
+              <div class="mn-day-col" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <span style="font-size: 10.5px; font-weight: 700; color: #FFFFFF;">Day ${d}</span>
+                <div id="mnDayCard1" class="gw-btn-press" style="width: 100%; height: 70px; background: #FFFFFF; border: 2.2px solid #22C55E; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 0 12px rgba(34, 197, 94, 0.45); cursor: pointer;">
+                  <!-- Gold circle with checkmark badge -->
+                  <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #FBBF24, #F59E0B); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);">
+                    <div style="width: 16px; height: 16px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 10px; font-weight: 900;">✓</div>
+                  </div>
+                  <span style="font-size: 13px; font-weight: 800; color: #0F172A;">${cur}${amt}</span>
+                </div>
+              </div>
+            `;
+          } else if (isDay2) {
+            return `
+              <div class="mn-day-col" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <span style="font-size: 10.5px; font-weight: 600; color: #94A3B8;">Day ${d}</span>
+                <div id="mnDayCard2" class="gw-btn-press" style="width: 100%; height: 70px; background: rgba(255, 255, 255, 0.1); border: 1.5px solid #22C55E; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer;">
+                  <img src="/assets/mynaksh/coinupcoming.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 24px; height: 24px; object-fit: contain;" alt="Coin" />
+                  <div style="display: none; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); align-items: center; justify-content: center; font-size: 10px; color: #E2E8F0;">★</div>
+                  <span style="font-size: 12.5px; font-weight: 700; color: #E2E8F0;">${cur}${amt}</span>
+                </div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="mn-day-col" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <span style="font-size: 10.5px; font-weight: 600; color: #64748B;">Day ${d}</span>
+                <div style="width: 100%; height: 70px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; opacity: 0.82;">
+                  <img src="/assets/mynaksh/dailystreakunclaimed.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 22px; height: 22px; object-fit: contain; opacity: 0.6;" alt="Coin" />
+                  <div style="display: none; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); align-items: center; justify-content: center; font-size: 9px; color: #94A3B8;">★</div>
+                  <span style="font-size: 12.5px; font-weight: 600; color: #94A3B8;">${cur}${amt}</span>
+                </div>
+              </div>
+            `;
+          }
+        }).join('');
+
+        mount.innerHTML = `
+          <div class="gw-phone-frame" style="background: #070B16; padding: 0; display: flex; flex-direction: column; height: 680px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none;">
+            
+            <!-- Top Controls (Switch views for demo) -->
+            <div style="position: absolute; top: 8px; right: 8px; z-index: 50; display: flex; gap: 6px;">
+              <button class="gw-replay-chip" id="mnTriggerCelebration" style="font-size: 10px; padding: 3px 8px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Celebrate</button>
+              <button class="gw-replay-chip" id="mnTriggerModal" style="font-size: 10px; padding: 3px 8px;"><i class="fa-solid fa-layer-group"></i> Modal</button>
+            </div>
+
+            <!-- iOS Top Status Bar -->
+            <div style="padding: 10px 20px 4px; display: flex; justify-content: space-between; align-items: center; color: #FFFFFF; font-size: 12px; font-weight: 600;">
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span>8:52</span>
+                <i class="fa-solid fa-location-arrow" style="font-size: 10px; transform: rotate(-45deg);"></i>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 11px;">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full" style="font-size: 13px;"></i>
+              </div>
+            </div>
+
+            <!-- Main Top Header: "Rewards" & "Wallet ₹30 +" -->
+            <div style="padding: 10px 18px 16px; display: flex; justify-content: space-between; align-items: center;">
+              <h1 style="color: #FFFFFF; font-size: 28px; font-weight: 800; letter-spacing: -0.6px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">Rewards</h1>
+              
+              <!-- Wallet Pill Badge -->
+              <div id="mnWalletBadge" class="gw-btn-press" style="background: #171C28; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; padding: 5px 6px 5px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                  <span style="font-size: 10px; color: #94A3B8; font-weight: 600; line-height: 1;">Wallet</span>
+                  <span id="mnWalletVal" style="font-size: 15px; font-weight: 800; color: #FFFFFF; line-height: 1.2;">${cur}${walletBalance}</span>
+                </div>
+                <div id="mnAddFundsBtn" style="width: 24px; height: 24px; border-radius: 50%; background: #D9531E; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; box-shadow: 0 2px 6px rgba(217, 83, 30, 0.45);">+</div>
+              </div>
+            </div>
+
+            <!-- Dark Streak Section: "Keep Your Streak Alive!" -->
+            <div style="padding: 0 16px 18px; background: #070B16;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FDE047, #F59E0B 65%, #B45309 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); flex-shrink: 0;">
+                  <img src="/assets/mynaksh/dailystreakcardicon.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="width: 28px; height: 28px; object-fit: contain;" alt="Streak Icon" />
+                  <span style="display: none; font-size: 18px; color: #FFF; font-weight: 900;">${cur}</span>
+                </div>
+                <div>
+                  <div style="font-size: 15px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.2px;">Keep Your Streak Alive!</div>
+                  <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px;">Collect your daily rewards here</div>
+                </div>
+              </div>
+
+              <!-- 7-Day Stepper Row -->
+              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 14px;">
+                ${dayPills}
+              </div>
+
+              <!-- Button: "Get ₹7 more tomorrow" -->
+              <button id="mnGetMoreBtn" class="gw-btn-press" style="width: 100%; height: 42px; border-radius: 21px; border: 1px solid rgba(255, 255, 255, 0.08); background: #252A36; color: #E2E8F0; font-size: 13.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+                Get ${cur}${nextAmt} more tomorrow
+              </button>
+            </div>
+
+            <!-- Warm Cream Page Body (Sand Tone Background) -->
+            <div style="background: #EDE6DC; padding: 14px 12px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1;">
+              
+              <!-- 1. "Refer a friend" Card -->
+              <div style="background: linear-gradient(135deg, #FFE8D6 0%, #FFF5ED 50%, #FFFFFF 100%); border-radius: 20px; padding: 18px 16px; box-shadow: 0 4px 16px rgba(180, 130, 80, 0.08); position: relative; overflow: hidden;">
+                <!-- Subtle decorative background dots -->
+                <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 120px; background-image: radial-gradient(#F59E0B 1px, transparent 1px); background-size: 12px 12px; opacity: 0.15; pointer-events: none;"></div>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div style="z-index: 2; max-width: 60%;">
+                    <div style="font-size: 16.5px; font-weight: 800; color: #1E1B18; line-height: 1.25;">Refer a friend</div>
+                    <div style="font-size: 16.5px; font-weight: 800; color: #1E1B18; line-height: 1.25; display: flex; align-items: center; gap: 4px; margin-top: 3px;">
+                      &amp; both earn <span style="display:inline-flex; width:16px; height:16px; border-radius:50%; background:#F59E0B; color:#FFF; font-size:9px; font-weight:900; align-items:center; justify-content:center; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">★</span> ${cur}${c.referralBonus || 50}
+                    </div>
+                    <div id="mnHowReferralBtn" class="gw-btn-press" style="display: inline-flex; align-items: center; gap: 4px; margin-top: 9px; padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(210, 140, 90, 0.35); background: rgba(255, 255, 255, 0.7); font-size: 11px; color: #78350F; font-weight: 600; cursor: pointer;">
+                      How referral works &rsaquo;
+                    </div>
+                  </div>
+
+                  <!-- 3D Stack of Golden Coins & Confetti Burst -->
+                  <div style="position: relative; width: 100px; height: 75px; z-index: 2; display: flex; align-items: center; justify-content: center;">
+                    <img src="/assets/mynaksh/wincoin.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.45));" alt="Coins" />
+                    <!-- Fallback SVG Stack -->
+                    <div style="display: none; width: 68px; height: 68px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FDE047, #F59E0B 60%, #B45309 100%); box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);"></div>
+                  </div>
+                </div>
+
+                <!-- Action Row: Share Button + WhatsApp Button -->
+                <div style="display: flex; gap: 10px; align-items: center; margin-top: 14px; z-index: 2; position: relative;">
+                  <button id="mnShareBtn" class="gw-btn-press" style="width: 46px; height: 46px; border-radius: 12px; border: 1px solid #E6DDD3; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #1E1B18; font-size: 16px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.04);" title="Share Link">
+                    <i class="fa-solid fa-share-nodes"></i>
+                  </button>
+
+                  <button id="mnWhatsappBtn" class="gw-btn-press" style="flex: 1; height: 46px; border-radius: 12px; border: none; background: #16A34A; color: #FFFFFF; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.28);">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i> Refer a friend
+                  </button>
+                </div>
+
+                <!-- Referral Code Row with Copy Icon -->
+                <div style="text-align: center; font-size: 12px; color: #52525B; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <span>Referral Code:</span>
+                  <strong style="color: #111827; letter-spacing: 0.5px; font-size: 13px;">${c.referralCode || 'R8HKBD'}</strong>
+                  <button id="mnCopyBtn" style="background: none; border: none; color: #52525B; cursor: pointer; padding: 2px 4px; font-size: 13px;" title="Copy Code">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                  <span id="mnCopyToast" style="display: none; font-size: 10.5px; color: #16A34A; font-weight: 700;">Copied!</span>
+                </div>
+              </div>
+
+              <!-- 2. "MANTRA JAAP" Card -->
+              <div style="background: #F7EFE7; border: 1px solid #EFE4D6; border-radius: 20px; padding: 16px 14px; position: relative;">
+                
+                <!-- Ornamental Section Divider -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: #78350F; font-size: 12px; font-weight: 800; letter-spacing: 1.2px;">
+                  <span style="height: 1px; width: 36px; background: #D1C5B6;"></span>
+                  ✦ MANTRA JAAP ✦
+                  <span style="height: 1px; width: 36px; background: #D1C5B6;"></span>
+                </div>
+
+                <div style="text-align: center; font-size: 11px; color: #78716C; margin: 6px auto 10px; max-width: 270px; line-height: 1.45;">
+                  Chant mantras and find peace, earn rewards as you stay consistent.
+                </div>
+
+                <!-- Claimed Indicator -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #78716C; margin-bottom: 12px;">
+                  <span style="display:inline-flex; width: 14px; height: 14px; border-radius: 50%; background: #F59E0B; color: #FFF; font-size: 8px; font-weight: 900; align-items: center; justify-content: center;">★</span> Claimed:
+                </div>
+
+                <!-- Mars Mantra Inner Sub-Card -->
+                <div style="background: #FFFFFF; border-radius: 16px; padding: 12px 12px; border: 1px solid #ECE3D7; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                  
+                  <!-- Left: Mars 3D Textured Sphere -->
+                  <div style="width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #F97316 0%, #C2410C 55%, #7C2D12 100%); box-shadow: 0 4px 10px rgba(194, 65, 12, 0.35); flex-shrink: 0; position: relative; overflow: hidden;">
+                    <!-- Texture craters -->
+                    <div style="position: absolute; top: 9px; left: 11px; width: 10px; height: 6px; border-radius: 50%; background: rgba(67, 20, 7, 0.45); filter: blur(0.5px);"></div>
+                    <div style="position: absolute; bottom: 10px; right: 12px; width: 14px; height: 8px; border-radius: 50%; background: rgba(67, 20, 7, 0.5); filter: blur(0.5px);"></div>
+                    <div style="position: absolute; top: 22px; left: 24px; width: 8px; height: 5px; border-radius: 50%; background: rgba(67, 20, 7, 0.35);"></div>
+                  </div>
+
+                  <!-- Center: Mantra Details -->
+                  <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: 800; color: #1C1917;">${c.mantraName || 'Mars Mantra'}</div>
+                    <div style="font-size: 11px; color: #948B83; margin-top: 2px;">${c.mantraChant || 'Om Am Angarakaya Namah'}</div>
+                  </div>
+
+                  <!-- Right: Claim ₹1 Button -->
+                  <button id="mnMantraClaimBtn" class="gw-btn-press" style="background: ${mantraClaimed ? '#DCFCE7' : '#FEF3C7'}; border: 1px solid ${mantraClaimed ? '#86EFAC' : '#FDE68A'}; border-radius: 18px; padding: 6px 12px; font-size: 11.5px; font-weight: 800; color: ${mantraClaimed ? '#15803D' : '#92400E'}; display: flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap;">
+                    <span>${mantraClaimed ? 'Claimed' : 'Claim'}</span>
+                    <span style="display:inline-flex; width: 14px; height: 14px; border-radius: 50%; background: ${mantraClaimed ? '#16A34A' : '#F59E0B'}; color: #FFF; font-size: 8px; font-weight: 900; align-items: center; justify-content: center;">${mantraClaimed ? '✓' : '★'}</span>
+                    ${mantraClaimed ? '' : `<span>${cur}${c.mantraReward || 1} &rsaquo;</span>`}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Navigation Bar (5 tabs matching native app) -->
+            <div style="background: #FAF6F0; border-top: 1px solid #E7DFD5; height: 62px; display: flex; align-items: center; justify-content: space-around; padding: 0 4px; flex-shrink: 0;">
+              
+              <!-- Tab 1: My Life (Lotus) -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.7;">
+                <i class="fa-solid fa-spa" style="font-size: 18px; color: #78716C;"></i>
+                <span style="font-size: 10px; color: #78716C; font-weight: 600;">My Life</span>
+              </div>
+
+              <!-- Tab 2: Chat -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.7;">
+                <i class="fa-regular fa-comment-dots" style="font-size: 18px; color: #78716C;"></i>
+                <span style="font-size: 10px; color: #78716C; font-weight: 600;">Chat</span>
+              </div>
+
+              <!-- Tab 3: Home -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.7;">
+                <i class="fa-regular fa-circle-dot" style="font-size: 18px; color: #78716C;"></i>
+                <span style="font-size: 10px; color: #78716C; font-weight: 600;">Home</span>
+              </div>
+
+              <!-- Tab 4: Reports (with NEW badge) -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.7; position: relative;">
+                <span style="position: absolute; top: -5px; right: 2px; background: #2563EB; color: #FFFFFF; font-size: 7.5px; font-weight: 900; padding: 1px 4px; border-radius: 6px;">NEW</span>
+                <i class="fa-regular fa-newspaper" style="font-size: 18px; color: #78716C;"></i>
+                <span style="font-size: 10px; color: #78716C; font-weight: 600;">Reports</span>
+              </div>
+
+              <!-- Tab 5: Rewards (ACTIVE TAB - Terracotta Raised Disc) -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #7C2D12; display: flex; align-items: center; justify-content: center; color: #FFFFFF; box-shadow: 0 4px 10px rgba(124, 45, 18, 0.35);">
+                  <i class="fa-solid fa-gift" style="font-size: 16px;"></i>
+                </div>
+                <span style="font-size: 10.5px; color: #7C2D12; font-weight: 800;">Rewards</span>
+              </div>
+            </div>
+
+          </div>
+        `;
+
+        // Interactive Event Listeners
+        const triggerCelebration = () => {
+          if (c.soundEnabled !== false) snd.playCoinCascade(6);
+          viewState = 'celebrate';
+          renderView();
+          fireConfetti(['#FBBF24', '#22C55E', '#FFFFFF']);
+          ctx.emit('mynaksh_streak_claimed', { widgetId: widget.id, day: activeDay, amount: rewards[activeDay - 1] });
+        };
+
+        const day1 = mount.querySelector('#mnDayCard1');
+        if (day1) day1.onclick = triggerCelebration;
+
+        const day2 = mount.querySelector('#mnDayCard2');
+        if (day2) day2.onclick = triggerCelebration;
+
+        const getMoreBtn = mount.querySelector('#mnGetMoreBtn');
+        if (getMoreBtn) getMoreBtn.onclick = triggerCelebration;
+
+        const trigCel = mount.querySelector('#mnTriggerCelebration');
+        if (trigCel) trigCel.onclick = triggerCelebration;
+
+        const trigModal = mount.querySelector('#mnTriggerModal');
+        if (trigModal) trigModal.onclick = () => { viewState = 'modal'; renderView(); };
+
+        // Mantra Claim
+        const mantraBtn = mount.querySelector('#mnMantraClaimBtn');
+        if (mantraBtn) {
+          mantraBtn.onclick = () => {
+            if (mantraClaimed) return;
+            mantraClaimed = true;
+            walletBalance += Number(c.mantraReward || 1);
+            if (c.soundEnabled !== false) snd.playRewardChime();
+            renderView();
+            fireConfetti(['#FBBF24', '#EA580C', '#FFFFFF']);
+            ctx.emit('mynaksh_mantra_claimed', { widgetId: widget.id, reward: c.mantraReward || 1, newWallet: walletBalance });
+          };
+        }
+
+        // Copy Referral Code
+        const copyBtn = mount.querySelector('#mnCopyBtn');
+        const copyToast = mount.querySelector('#mnCopyToast');
+        if (copyBtn) {
+          copyBtn.onclick = () => {
+            const code = c.referralCode || 'R8HKBD';
+            navigator.clipboard?.writeText(code).catch(() => {});
+            if (c.soundEnabled !== false) snd.playToastPop();
+            if (copyToast) {
+              copyToast.style.display = 'inline';
+              setTimeout(() => { copyToast.style.display = 'none'; }, 2000);
+            }
+          };
+        }
+
+        // WhatsApp Share
+        const waBtn = mount.querySelector('#mnWhatsappBtn');
+        if (waBtn) {
+          waBtn.onclick = () => {
+            if (c.soundEnabled !== false) snd.playToastPop();
+            window.open(`https://wa.me/?text=Use%20my%20referral%20code%20${c.referralCode || 'R8HKBD'}%20on%20MyNaksh%20to%20get%20₹50!`, '_blank');
+          };
+        }
+
+        // Wallet Add Funds
+        const walletBadge = mount.querySelector('#mnWalletBadge');
+        if (walletBadge) {
+          walletBadge.onclick = () => {
+            walletBalance += 10;
+            if (c.soundEnabled !== false) snd.playRewardChime();
+            renderView();
+          };
+        }
       }
     }
+
     renderView();
   }
 
