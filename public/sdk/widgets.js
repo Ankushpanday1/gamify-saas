@@ -1514,6 +1514,219 @@
     };
   }
 
+  // =========================================================================
+  // 8. TRIPLE PODIUM GAMIFIED LEADERBOARD (Region / National / Global)
+  // =========================================================================
+  function renderGamifyLeaderboard(mount, widget, ctx) {
+    const c = widget.config;
+    const snd = ctx.sound;
+    let currentTab = c.activeTab || 'Region';
+    const tabs = Array.isArray(c.tabs) ? c.tabs : ['Region', 'National', 'Global'];
+
+    // Multipliers for tab datasets
+    const tabMultipliers = {
+      'Region': 1,
+      'National': 1.65,
+      'Global': 2.85
+    };
+
+    let topThree = JSON.parse(JSON.stringify(c.topThree || [
+      { rank: 1, name: 'Eiden', username: '@username', score: 2430, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', color: '#F59E0B' },
+      { rank: 2, name: 'Jackson', username: '@username', score: 1847, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80', color: '#38BDF8' },
+      { rank: 3, name: 'Emma Aria', username: '@username', score: 1674, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80', color: '#22C55E' }
+    ]));
+
+    let listPlayers = JSON.parse(JSON.stringify(c.listPlayers || [
+      { rank: 4, name: 'Sebastian', username: '@username', score: 1124, trend: 'up', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80' },
+      { rank: 5, name: 'Jason', username: '@username', score: 875, trend: 'down', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80' },
+      { rank: 6, name: 'Natalie', username: '@username', score: 774, trend: 'up', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80' },
+      { rank: 7, name: 'Serenity', username: '@username', score: 723, trend: 'up', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80' }
+    ]));
+
+    function getAdjustedScore(baseScore) {
+      const mult = tabMultipliers[currentTab] || 1;
+      return Math.round(baseScore * mult);
+    }
+
+    function renderView() {
+      const rank1 = topThree.find(p => p.rank === 1) || topThree[0];
+      const rank2 = topThree.find(p => p.rank === 2) || topThree[1];
+      const rank3 = topThree.find(p => p.rank === 3) || topThree[2];
+
+      const tabsHtml = tabs.map(tab => {
+        const isActive = tab === currentTab;
+        return `
+          <div class="lb-tab-btn" data-tab="${tab}" style="flex: 1; text-align: center; padding: 8px 4px; cursor: pointer; position: relative;">
+            <span style="font-size: 13.5px; font-weight: ${isActive ? '700' : '500'}; color: ${isActive ? '#FFFFFF' : '#8A99AD'}; transition: color 0.2s;">
+              ${tab}
+            </span>
+            ${isActive ? `
+              <div style="width: 32px; height: 3px; background: #38BDF8; border-radius: 2px; margin: 4px auto 0; box-shadow: 0 0 10px rgba(56, 189, 248, 0.7); animation: gwPopIn 0.2s ease;"></div>
+            ` : '<div style="height: 3px; margin-top: 4px;"></div>'}
+          </div>
+        `;
+      }).join('');
+
+      const rowsHtml = listPlayers.map((player, idx) => {
+        const score = getAdjustedScore(player.score);
+        const isUp = player.trend === 'up';
+        const isLast = idx === listPlayers.length - 1;
+        return `
+          <div class="lb-player-row gw-btn-press" data-name="${player.name}" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 4px; ${isLast ? '' : 'border-bottom: 1px solid rgba(255, 255, 255, 0.06);'} cursor: pointer; transition: background 0.15s;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <img src="${player.avatar}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=1E293B&color=FFF';" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255, 255, 255, 0.12);" alt="${player.name}" />
+              <div>
+                <div style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.2px;">${player.name}</div>
+                <div style="font-size: 11px; color: #64748B; margin-top: 2px;">${player.username}</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14.5px; font-weight: 800; color: #FFFFFF; font-variant-numeric: tabular-nums;">${score.toLocaleString()}</span>
+              <span style="font-size: 9px; color: ${isUp ? '#22C55E' : '#EF4444'};">${isUp ? '▲' : '▼'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      mount.innerHTML = `
+        <div class="gw-phone-frame" style="background: #0E1322; padding: 0; display: flex; flex-direction: column; height: 680px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          
+          <!-- Top iOS Status & App Header -->
+          <div style="padding: 12px 18px 4px; display: flex; justify-content: space-between; align-items: center; color: #FFFFFF;">
+            <!-- Back Arrow -->
+            <button id="lbBackBtn" class="gw-btn-press" style="width: 32px; height: 32px; border-radius: 50%; background: transparent; border: none; color: #4A9DFF; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <!-- Title -->
+            <div style="font-size: 17px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.2px;">${c.title || 'Leaderboard'}</div>
+
+            <!-- 4-Dot Menu Icon -->
+            <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #4A9DFF; cursor: pointer;">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="4" cy="4" r="2.2" />
+                <circle cx="12" cy="4" r="2.2" />
+                <circle cx="4" cy="12" r="2.2" />
+                <circle cx="12" cy="12" r="2.2" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Segmented Tab Bar (Region / National / Global) -->
+          <div style="margin: 12px 18px 16px; background: #161D32; border-radius: 14px; padding: 3px 6px; display: flex; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 14px rgba(0,0,0,0.2);">
+            ${tabsHtml}
+          </div>
+
+          <!-- Triple Podium Section (Rank 2 | Rank 1 | Rank 3) -->
+          <div style="padding: 0 14px; display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 10px;">
+            
+            <!-- RANK 2: Jackson (Left) -->
+            <div class="lb-podium-col gw-btn-press" data-name="${rank2.name}" style="flex: 1; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+              <div style="position: relative; margin-bottom: -10px; z-index: 2;">
+                <img src="${rank2.avatar}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(rank2.name)}&background=0284C7&color=FFF';" style="width: 66px; height: 66px; border-radius: 50%; object-fit: cover; border: 3px solid #38BDF8; box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);" alt="${rank2.name}" />
+                <div style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 22px; height: 22px; background: #0284C7; border: 1.5px solid #38BDF8; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                  <span style="transform: rotate(-45deg); font-size: 11px; font-weight: 900; color: #FFFFFF;">2</span>
+                </div>
+              </div>
+              <div style="width: 100%; height: 138px; background: #18223C; border-radius: 18px 18px 0 0; padding: 20px 6px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(56, 189, 248, 0.2);">
+                <div style="font-size: 13.5px; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 84px;">${rank2.name}</div>
+                <div style="font-size: 16px; font-weight: 800; color: #38BDF8; margin: 4px 0 2px; font-variant-numeric: tabular-nums;">${getAdjustedScore(rank2.score).toLocaleString()}</div>
+                <div style="font-size: 10.5px; color: #64748B;">${rank2.username}</div>
+              </div>
+            </div>
+
+            <!-- RANK 1: Eiden (Center - Tallest & Crowned) -->
+            <div class="lb-podium-col gw-btn-press" data-name="${rank1.name}" style="flex: 1.15; display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 5;">
+              <!-- 5-Point Golden Crown -->
+              <div style="margin-bottom: -4px; animation: gwFloatCoin 3s ease-in-out infinite;">
+                <svg width="34" height="26" viewBox="0 0 24 20" fill="none">
+                  <path d="M2 17L4 6L8.5 11L12 3L15.5 11L20 6L22 17H2Z" fill="url(#crownGrad)" stroke="#FDE68A" stroke-width="1.2" stroke-linejoin="round" />
+                  <circle cx="12" cy="3" r="1.5" fill="#FFF" />
+                  <circle cx="4" cy="6" r="1.2" fill="#FFF" />
+                  <circle cx="20" cy="6" r="1.2" fill="#FFF" />
+                  <defs>
+                    <linearGradient id="crownGrad" x1="2" y1="3" x2="22" y2="17" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#FDE047" />
+                      <stop offset="0.6" stop-color="#F59E0B" />
+                      <stop offset="1" stop-color="#B45309" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <div style="position: relative; margin-bottom: -12px; z-index: 2;">
+                <img src="${rank1.avatar}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(rank1.name)}&background=D97706&color=FFF';" style="width: 82px; height: 82px; border-radius: 50%; object-fit: cover; border: 3.5px solid #F59E0B; box-shadow: 0 0 24px rgba(245, 158, 11, 0.55);" alt="${rank1.name}" />
+                <div style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 24px; height: 24px; background: #D97706; border: 1.5px solid #FDE68A; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+                  <span style="transform: rotate(-45deg); font-size: 12px; font-weight: 900; color: #FFFFFF;">1</span>
+                </div>
+              </div>
+
+              <div style="width: 100%; height: 172px; background: #1D2847; border-radius: 20px 20px 0 0; padding: 24px 8px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(245, 158, 11, 0.35); box-shadow: 0 -8px 24px rgba(0,0,0,0.3);">
+                <div style="font-size: 15px; font-weight: 800; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 96px;">${rank1.name}</div>
+                <div style="font-size: 19px; font-weight: 900; color: #F59E0B; margin: 4px 0 2px; font-variant-numeric: tabular-nums;">${getAdjustedScore(rank1.score).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #64748B;">${rank1.username}</div>
+              </div>
+            </div>
+
+            <!-- RANK 3: Emma Aria (Right) -->
+            <div class="lb-podium-col gw-btn-press" data-name="${rank3.name}" style="flex: 1; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+              <div style="position: relative; margin-bottom: -10px; z-index: 2;">
+                <img src="${rank3.avatar}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(rank3.name)}&background=16A34A&color=FFF';" style="width: 66px; height: 66px; border-radius: 50%; object-fit: cover; border: 3px solid #22C55E; box-shadow: 0 0 16px rgba(34, 197, 94, 0.45);" alt="${rank3.name}" />
+                <div style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 22px; height: 22px; background: #16A34A; border: 1.5px solid #86EFAC; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                  <span style="transform: rotate(-45deg); font-size: 11px; font-weight: 900; color: #FFFFFF;">3</span>
+                </div>
+              </div>
+              <div style="width: 100%; height: 126px; background: #18223C; border-radius: 18px 18px 0 0; padding: 20px 6px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(34, 197, 94, 0.2);">
+                <div style="font-size: 13.5px; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 84px;">${rank3.name}</div>
+                <div style="font-size: 16px; font-weight: 800; color: #22C55E; margin: 4px 0 2px; font-variant-numeric: tabular-nums;">${getAdjustedScore(rank3.score).toLocaleString()}</div>
+                <div style="font-size: 10.5px; color: #64748B;">${rank3.username}</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Sheet (Ranks 4+) -->
+          <div style="background: #141A2D; border-radius: 26px 26px 0 0; padding: 16px 18px 24px; box-shadow: 0 -10px 30px rgba(0,0,0,0.4); flex: 1; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+            ${rowsHtml}
+          </div>
+
+        </div>
+      `;
+
+      // Event handlers for tab clicks
+      mount.querySelectorAll('.lb-tab-btn').forEach(btn => {
+        btn.onclick = () => {
+          const tab = btn.getAttribute('data-tab');
+          if (tab === currentTab) return;
+          currentTab = tab;
+          if (c.soundEnabled !== false) snd.playToastPop();
+          renderView();
+          ctx.emit('leaderboard_tab_switched', { widgetId: widget.id, tab });
+        };
+      });
+
+      // Event handlers for player row click
+      mount.querySelectorAll('.lb-player-row, .lb-podium-col').forEach(row => {
+        row.onclick = () => {
+          const name = row.getAttribute('data-name');
+          if (c.soundEnabled !== false) snd.playRewardChime();
+          fireConfetti(['#38BDF8', '#F59E0B', '#22C55E']);
+          ctx.emit('leaderboard_player_inspected', { widgetId: widget.id, name });
+        };
+      });
+
+      const backBtn = mount.querySelector('#lbBackBtn');
+      if (backBtn) {
+        backBtn.onclick = () => {
+          if (c.soundEnabled !== false) snd.playToastPop();
+          ctx.emit('leaderboard_back_pressed', { widgetId: widget.id });
+        };
+      }
+    }
+
+    renderView();
+  }
+
   // Public API
   window.GamifyWidgets = {
     render(mountEl, widget, opts = {}) {
@@ -1530,6 +1743,7 @@
         case 'paytm_spin_win': return renderPaytmSpinWin(mountEl, widget, ctx);
         case 'duolingo_flow': return renderDuolingoFlow(mountEl, widget, ctx);
         case 'cred_wheel': return renderCredWheel(mountEl, widget, ctx);
+        case 'gamify_leaderboard': return renderGamifyLeaderboard(mountEl, widget, ctx);
         default:
           mountEl.innerHTML = `<div style="color:#94A3B8;">Unknown widget type: ${widget.type}</div>`;
       }

@@ -371,6 +371,18 @@
         fields += fieldInput('accentGreen', 'Accent Neon Green', c.accentGreen, 'color');
         fields += fieldInput('goldTone', 'Brushed Gold Rim', c.goldTone, 'color');
         fields += fieldInput('spinCostCoins', 'Spin Cost (CRED Coins)', c.spinCostCoins, 'number');
+      } else if (w.type === 'gamify_leaderboard') {
+        fields += fieldInput('title', 'Leaderboard Title', c.title);
+        fields += fieldSelect('activeTab', 'Default Active Tab', c.activeTab, [['Region', 'Region'], ['National', 'National'], ['Global', 'Global']]);
+        const r1 = (c.topThree && c.topThree[0]) || { name: 'Eiden', score: 2430 };
+        const r2 = (c.topThree && c.topThree[1]) || { name: 'Jackson', score: 1847 };
+        const r3 = (c.topThree && c.topThree[2]) || { name: 'Emma Aria', score: 1674 };
+        fields += fieldInput('rank1Name', 'Rank 1 Champion Name', r1.name);
+        fields += fieldInput('rank1Score', 'Rank 1 Score', r1.score, 'number');
+        fields += fieldInput('rank2Name', 'Rank 2 Name', r2.name);
+        fields += fieldInput('rank2Score', 'Rank 2 Score', r2.score, 'number');
+        fields += fieldInput('rank3Name', 'Rank 3 Name', r3.name);
+        fields += fieldInput('rank3Score', 'Rank 3 Score', r3.score, 'number');
       }
 
       fields += fieldInput('soundEnabled', 'Enable Sound Effects', c.soundEnabled, 'boolean');
@@ -390,6 +402,24 @@
           const k = inp.getAttribute('data-key');
           if (k === 'dayRewardsCsv') {
             selectedWidget.config.dayRewards = inp.value.split(',').map(x => Number(x.trim()) || 0).slice(0, 7);
+          } else if (k === 'rank1Name') {
+            if (!selectedWidget.config.topThree) selectedWidget.config.topThree = [{}, {}, {}];
+            selectedWidget.config.topThree[0].name = inp.value;
+          } else if (k === 'rank1Score') {
+            if (!selectedWidget.config.topThree) selectedWidget.config.topThree = [{}, {}, {}];
+            selectedWidget.config.topThree[0].score = Number(inp.value);
+          } else if (k === 'rank2Name') {
+            if (!selectedWidget.config.topThree) selectedWidget.config.topThree = [{}, {}, {}];
+            selectedWidget.config.topThree[1].name = inp.value;
+          } else if (k === 'rank2Score') {
+            if (!selectedWidget.config.topThree) selectedWidget.config.topThree = [{}, {}, {}];
+            selectedWidget.config.topThree[1].score = Number(inp.value);
+          } else if (k === 'rank3Name') {
+            if (!selectedWidget.config.topThree) selectedWidget.config.topThree = [{}, {}, {}];
+            selectedWidget.config.topThree[2].name = inp.value;
+          } else if (k === 'rank3Score') {
+            if (!selectedWidget.config.topThree) selectedWidget.config.topThree = [{}, {}, {}];
+            selectedWidget.config.topThree[2].score = Number(inp.value);
           } else {
             selectedWidget.config[k] = inp.type === 'number' ? Number(inp.value) : inp.value;
           }
