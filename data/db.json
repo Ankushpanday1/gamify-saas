@@ -32,7 +32,7 @@
       },
       "stats": {
         "impressions": 5420,
-        "claims": 4314,
+        "claims": 4316,
         "conversionRate": "79.6%"
       }
     },
@@ -70,8 +70,8 @@
       },
       "stats": {
         "impressions": 3290,
-        "claims": 2482,
-        "conversionRate": "75.4%"
+        "claims": 2484,
+        "conversionRate": "75.5%"
       }
     },
     {
@@ -108,8 +108,8 @@
       },
       "stats": {
         "impressions": 6890,
-        "claims": 5942,
-        "conversionRate": "86.2%"
+        "claims": 5943,
+        "conversionRate": "86.3%"
       }
     },
     {
@@ -147,7 +147,7 @@
       },
       "stats": {
         "impressions": 7450,
-        "claims": 6323,
+        "claims": 6325,
         "conversionRate": "84.9%"
       }
     },
@@ -169,7 +169,7 @@
       },
       "stats": {
         "impressions": 9120,
-        "claims": 8143,
+        "claims": 8146,
         "conversionRate": "89.3%"
       }
     },
@@ -219,8 +219,8 @@
       },
       "stats": {
         "impressions": 5800,
-        "claims": 4921,
-        "conversionRate": "84.8%"
+        "claims": 4922,
+        "conversionRate": "84.9%"
       }
     },
     {
@@ -243,8 +243,8 @@
       },
       "stats": {
         "impressions": 7120,
-        "claims": 5891,
-        "conversionRate": "82.7%"
+        "claims": 5893,
+        "conversionRate": "82.8%"
       }
     },
     {
@@ -326,8 +326,8 @@
       },
       "stats": {
         "impressions": 6120,
-        "claims": 4890,
-        "conversionRate": "79.9%"
+        "claims": 4893,
+        "conversionRate": "80.0%"
       }
     }
   ],
@@ -555,6 +555,163 @@
         "widgetId": "zepto_scratch_01"
       },
       "timestamp": "2026-11-16T20:00:37.547Z"
+    },
+    {
+      "id": "evt_1794862529261",
+      "userId": "demo_user_001",
+      "event": "mynaksh_streak_claimed",
+      "metadata": {
+        "widgetId": "mynaksh_checkin_02",
+        "day": 1,
+        "amount": 5
+      },
+      "timestamp": "2026-11-16T20:55:29.262Z"
+    },
+    {
+      "id": "evt_1794862544991",
+      "userId": "demo_user_001",
+      "event": "zepto_scratch_revealed",
+      "metadata": {
+        "widgetId": "zepto_scratch_01"
+      },
+      "timestamp": "2026-11-16T20:55:44.991Z"
+    },
+    {
+      "id": "evt_1794862566860",
+      "userId": "demo_user_001",
+      "event": "duolingo_flow_completed",
+      "metadata": {
+        "widgetId": "duolingo_flow_06"
+      },
+      "timestamp": "2026-11-16T20:56:06.860Z"
+    },
+    {
+      "id": "evt_1794862578029",
+      "userId": "demo_user_001",
+      "event": "paytm_chest_opened",
+      "metadata": {
+        "widgetId": "paytm_chest_04",
+        "rewardCoins": 31
+      },
+      "timestamp": "2026-11-16T20:56:18.029Z"
+    },
+    {
+      "id": "evt_1794862588645",
+      "userId": "demo_user_001",
+      "event": "paytm_spin_won",
+      "metadata": {
+        "widgetId": "paytm_spin_05",
+        "prize": "30 Days Free Pro"
+      },
+      "timestamp": "2026-11-16T20:56:28.645Z"
+    },
+    {
+      "id": "evt_1794862608271",
+      "userId": "studio_preview",
+      "event": "zepto_scratch_revealed",
+      "metadata": {
+        "widgetId": "zepto_scratch_01"
+      },
+      "timestamp": "2026-11-16T20:56:48.271Z"
+    },
+    {
+      "id": "evt_1794862671998",
+      "userId": "studio_preview",
+      "event": "mynaksh_streak_claimed",
+      "metadata": {
+        "widgetId": "mynaksh_checkin_02",
+        "day": 1,
+        "amount": 5
+      },
+      "timestamp": "2026-11-16T20:57:51.998Z"
+    },
+    {
+      "id": "evt_1794862693199",
+      "userId": "studio_preview",
+      "event": "paytm_spin_won",
+      "metadata": {
+        "widgetId": "paytm_spin_05",
+        "prize": "4 at Rs. 549"
+      },
+      "timestamp": "2026-11-16T20:58:13.199Z"
+    },
+    {
+      "id": "evt_1794862718737",
+      "userId": "studio_preview",
+      "event": "duolingo_flow_completed",
+      "metadata": {
+        "widgetId": "duolingo_flow_06"
+      },
+      "timestamp": "2026-11-16T20:58:38.737Z"
+    },
+    {
+      "id": "evt_1794862737651",
+      "userId": "studio_preview",
+      "event": "cred_slot_won",
+      "metadata": {
+        "widgetId": "cred_slot_09",
+        "reward": "30% off your next uber intercity ride, up to ₹500"
+      },
+      "timestamp": "2026-11-16T20:58:57.651Z"
+    },
+    {
+      "id": "evt_1794862862640",
+      "userId": "studio_preview",
+      "event": "duolingo_flow_completed",
+      "metadata": {
+        "widgetId": "duolingo_flow_06"
+      },
+      "timestamp": "2026-11-16T21:01:02.640Z"
+    },
+    {
+      "id": "evt_1794862876219",
+      "userId": "studio_preview",
+      "event": "cred_wheel_won",
+      "metadata": {
+        "widgetId": "cred_wheel_07",
+        "prize": "2-in-1 trimmer at ₹1,099"
+      },
+      "timestamp": "2026-11-16T21:01:16.219Z"
+    },
+    {
+      "id": "evt_1794862904156",
+      "userId": "studio_preview",
+      "event": "cred_slot_won",
+      "metadata": {
+        "widgetId": "cred_slot_09",
+        "reward": "30% off your next uber intercity ride, up to ₹500"
+      },
+      "timestamp": "2026-11-16T21:01:44.156Z"
+    },
+    {
+      "id": "evt_1794862923642",
+      "userId": "studio_preview",
+      "event": "leaderboard_tab_switched",
+      "metadata": {
+        "widgetId": "gamify_leaderboard_08",
+        "tab": "National"
+      },
+      "timestamp": "2026-11-16T21:02:03.642Z"
+    },
+    {
+      "id": "evt_1794862924559",
+      "userId": "studio_preview",
+      "event": "leaderboard_tab_switched",
+      "metadata": {
+        "widgetId": "gamify_leaderboard_08",
+        "tab": "Global"
+      },
+      "timestamp": "2026-11-16T21:02:04.559Z"
+    },
+    {
+      "id": "evt_1794862925816",
+      "userId": "studio_preview",
+      "event": "leaderboard_tab_switched",
+      "metadata": {
+        "widgetId": "gamify_leaderboard_08",
+        "tab": "Region"
+      },
+      "timestamp": "2026-11-16T21:02:05.816Z"
     }
   ]
 }
