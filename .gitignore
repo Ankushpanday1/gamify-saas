@@ -6,5 +6,7 @@ npm-debug.log*
 .env.local
 *.mp4
 *.apk
+frames_inspect/
+
 
 

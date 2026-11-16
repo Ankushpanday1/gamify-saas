@@ -1415,103 +1415,541 @@
   }
 
   // =========================================================================
-  // 7. CRED OBSIDIAN SPIN WHEEL (Neo-Brutalist Dark Luxury)
+  // 7. CRED SPIN THE WHEEL (1:1 with ScreenRecording 11-16-2026 20-31-28)
   // =========================================================================
   function renderCredWheel(mount, widget, ctx) {
     const c = widget.config;
     const snd = ctx.sound;
-    const segments = Array.isArray(c.segments) ? c.segments : [
-      { label: '500 COINS', color: '#161821', text: '#FFFFFF' },
-      { label: '₹100 CASH', color: '#E5B869', text: '#0C0D11' },
-      { label: 'JACKPOT', color: '#00E599', text: '#0C0D11' },
-      { label: '2X BOOSTER', color: '#1D212F', text: '#FFFFFF' },
-      { label: 'MYSTERY', color: '#2B3144', text: '#E5B869' },
-      { label: '5000 COINS', color: '#161821', text: '#FFFFFF' }
-    ];
-    let currentAngle = 0;
+    let coins = Number(c.coins || 560052);
+    let cashback = Number(c.cashback || 77);
+    let tickets = Number(c.tickets || 4);
     let isSpinning = false;
+    let currentAngle = 0;
+    let showVoucherModal = false;
+    let wonSegment = null;
 
-    mount.innerHTML = `
-      <div class="gw-phone-frame" style="background: ${c.bgTone || '#0C0D11'}; color: #FFF; padding: 24px 18px; justify-content: space-between; align-items: center;">
-        <div style="font-family: monospace; font-size: 11px; background: #161821; border: 1px solid #262A3A; padding: 6px 14px; border-radius: 6px; color: #9CA3AF;">
-          CRED COINS: <span style="color: ${c.goldTone || '#E5B869'}; font-weight: 800;">2,450,000</span>
-        </div>
+    const segments = Array.isArray(c.segments) && c.segments.length === 4 ? c.segments : [
+      { label: "2-in-1 trimmer\nat ₹899", color: "#D946EF", text: "#1E1B18", price: 899 },
+      { label: "2-in-1 trimmer\nat ₹999", color: "#F97316", text: "#1E1B18", price: 999 },
+      { label: "2-in-1 trimmer\nat ₹1,099", color: "#84CC16", text: "#1E1B18", price: 1099 },
+      { label: "2-in-1 trimmer\nat ₹1,199", color: "#06B6D4", text: "#1E1B18", price: 1199 }
+    ];
 
-        <div style="position: relative; width: 236px; height: 236px;">
-          <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid ${c.accentGreen || '#00E599'}; z-index: 10;"></div>
-          <canvas id="credWheelCv" width="236" height="236" style="border-radius: 50%; box-shadow: 0 0 0 6px #1D202D;"></canvas>
-        </div>
+    function renderView() {
+      if (showVoucherModal && wonSegment) {
+        mount.innerHTML = `
+          <div class="gw-phone-frame" style="background: #000000; color: #FFFFFF; padding: 20px 16px; display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto; position: relative;">
+            
+            <!-- Top Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <button id="credCloseVoucher" class="gw-btn-press" style="width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #FFF; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+              <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 5px 14px; font-size: 12px; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-circle-info"></i> details
+              </div>
+            </div>
 
-        <button id="credSpinAction" class="gw-btn-press" style="width: 100%; height: 48px; border-radius: 8px; border: none; background: #FFFFFF; color: #0C0D11; font-weight: 900; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer;">
-          Spin to Win (${c.spinCostCoins || 1000} Coins)
-        </button>
-      </div>
-    `;
+            <!-- Product Showcase Card -->
+            <div style="background: #FFFFFF; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 35px rgba(0,0,0,0.6); animation: gwPopIn 0.35s ease;">
+              <!-- Product Image Showcase -->
+              <div style="position: relative; background: #0F5132; height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="${c.rewardImage || 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=600&q=80'}" style="width: 100%; height: 100%; object-fit: cover;" alt="Product" />
+                <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-family: sans-serif; font-weight: 900; font-size: 13px; color: #FFFFFF; letter-spacing: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); text-align: center;">
+                  ${c.partnerName || 'BOMBAY SHAVING COMPANY'}
+                </div>
+              </div>
 
-    const cv = mount.querySelector('#credWheelCv');
-    const cctx = cv.getContext('2d');
-    function draw() {
-      const n = segments.length;
-      const arc = (Math.PI * 2) / n;
-      cctx.clearRect(0, 0, 236, 236);
-      segments.forEach((s, i) => {
-        const a = currentAngle + i * arc;
-        cctx.beginPath();
-        cctx.moveTo(118, 118);
-        cctx.arc(118, 118, 112, a, a + arc);
-        cctx.closePath();
-        cctx.fillStyle = s.color;
-        cctx.fill();
-        cctx.strokeStyle = '#282D3D';
-        cctx.lineWidth = 2;
-        cctx.stroke();
+              <!-- Perforated Serrated Ticket Body -->
+              <div style="background: #F4FBF7; padding: 20px 18px 24px; position: relative;">
+                <!-- Left/Right Ticket Notches -->
+                <div style="position: absolute; top: -14px; left: -14px; width: 28px; height: 28px; border-radius: 50%; background: #000000;"></div>
+                <div style="position: absolute; top: -14px; right: -14px; width: 28px; height: 28px; border-radius: 50%; background: #000000;"></div>
 
-        cctx.save();
-        cctx.translate(118, 118);
-        cctx.rotate(a + arc / 2);
-        cctx.fillStyle = s.text || '#FFF';
-        cctx.font = 'bold 10px monospace';
-        cctx.textAlign = 'right';
-        cctx.fillText(s.label, 100, 4);
-        cctx.restore();
-      });
-      cctx.beginPath();
-      cctx.arc(118, 118, 24, 0, Math.PI * 2);
-      cctx.fillStyle = '#0C0D11';
-      cctx.fill();
-      cctx.strokeStyle = c.goldTone || '#E5B869';
-      cctx.lineWidth = 3.5;
-      cctx.stroke();
-    }
-    draw();
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                  <div>
+                    <h2 style="font-family: Georgia, serif; font-size: 21px; font-weight: 800; color: #0C0D11; margin: 0 0 10px;">${wonSegment.label.replace('\n', ' ')}</h2>
+                    <div style="display: inline-flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 20px; padding: 6px 14px; cursor: pointer;">
+                      <span id="credPromoCode" style="font-weight: 800; font-size: 13px; color: #0F172A; letter-spacing: 0.5px;">${c.couponCode || 'CRED899'}</span>
+                      <i class="fa-regular fa-copy" style="font-size: 12px; color: #64748B;"></i>
+                    </div>
+                  </div>
+                  <!-- Barcode Graphic -->
+                  <div style="display: flex; gap: 2px; height: 42px; opacity: 0.85;">
+                    <span style="width: 2px; background: #000;"></span><span style="width: 4px; background: #000;"></span><span style="width: 1px; background: #000;"></span><span style="width: 3px; background: #000;"></span><span style="width: 1px; background: #000;"></span><span style="width: 4px; background: #000;"></span><span style="width: 2px; background: #000;"></span><span style="width: 3px; background: #000;"></span>
+                  </div>
+                </div>
 
-    mount.querySelector('#credSpinAction').onclick = () => {
-      if (isSpinning) return;
-      isSpinning = true;
-      const start = performance.now();
-      const initAng = currentAngle;
-      const delta = Math.PI * 2 * (5 + Math.random() * 3);
-      let lastTick = 0;
+                <button id="credRedeemNowBtn" class="gw-btn-press" style="width: 100%; height: 48px; border-radius: 12px; border: none; background: #059669; color: #FFFFFF; font-size: 14.5px; font-weight: 800; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; cursor: pointer; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4);">
+                  <span>Redeem Now</span>
+                  <i class="fa-solid fa-arrow-right-long"></i>
+                </button>
+              </div>
+            </div>
 
-      function anim(now) {
-        const p = Math.min((now - start) / (c.decelerationDurationMs || 3800), 1);
-        currentAngle = initAng + delta * (1 - Math.pow(1 - p, 4));
-        draw();
-        const t = Math.floor(currentAngle * 4);
-        if (t !== lastTick) {
-          lastTick = t;
-          if (c.soundEnabled !== false) snd.playWheelTick();
-        }
-        if (p < 1) requestAnimationFrame(anim);
-        else {
-          isSpinning = false;
-          if (c.soundEnabled !== false) snd.playRewardChime();
-          fireConfetti([c.accentGreen || '#00E599', c.goldTone || '#E5B869', '#FFF']);
-          ctx.emit('cred_wheel_spun', { widgetId: widget.id });
-        }
+            <!-- Bottom Back Button -->
+            <button id="credPlayAgainBtn" class="gw-btn-press" style="margin-top: 18px; width: 100%; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #FFF; font-weight: 700; font-size: 13px; cursor: pointer;">
+              Spin Again
+            </button>
+          </div>
+        `;
+
+        mount.querySelector('#credCloseVoucher').onclick = () => { showVoucherModal = false; renderView(); };
+        mount.querySelector('#credPlayAgainBtn').onclick = () => { showVoucherModal = false; renderView(); };
+        mount.querySelector('#credRedeemNowBtn').onclick = () => {
+          if (c.soundEnabled !== false) snd.playToastPop();
+          navigator.clipboard?.writeText(c.couponCode || 'CRED899').catch(() => {});
+          alert(`Coupon code ${c.couponCode || 'CRED899'} copied!`);
+        };
+        return;
       }
-      requestAnimationFrame(anim);
-    };
+
+      // Main Spin Wheel Screen
+      mount.innerHTML = `
+        <div class="gw-phone-frame" style="background: #090614; color: #FFFFFF; padding: 12px 14px 20px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+          
+          <!-- Top App Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+            <!-- Left Controls: Close & Sound -->
+            <div style="display: flex; gap: 8px;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">✕</div>
+              <div id="credSoundToggle" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;"><i class="fa-solid fa-volume-high"></i></div>
+            </div>
+
+            <!-- Right Pills: Coins | Cashback | Tickets -->
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <!-- Coins Pill -->
+              <div style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35); border-radius: 16px; padding: 4px 10px; display: flex; align-items: center; gap: 6px;">
+                <span style="width: 14px; height: 14px; border-radius: 50%; background: #F59E0B; display: inline-flex; align-items: center; justify-content: center; color: #FFF; font-size: 8px; font-weight: 900;">C</span>
+                <span id="credCoinBalance" style="font-size: 12px; font-weight: 800; color: #FDE047;">${coins.toLocaleString()}</span>
+              </div>
+              <!-- Cash Pill -->
+              <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 16px; padding: 4px 10px; display: flex; align-items: center; gap: 5px;">
+                <span style="font-size: 11px;">💵</span>
+                <span style="font-size: 12px; font-weight: 800; color: #E9D5FF;">₹${cashback}</span>
+              </div>
+              <!-- Tickets Pill -->
+              <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 16px; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 11px;">🎟️</span>
+                <span style="font-size: 12px; font-weight: 800; color: #86EFAC;">${tickets}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Title: "spin the wheel" (Calligraphic Italic + Golden Serif) -->
+          <div style="text-align: center; margin: 10px 0 6px; z-index: 5;">
+            <div style="font-family: Georgia, serif; font-style: italic; font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 0.9; letter-spacing: -0.5px;">${c.titleScript || 'spin'}</div>
+            <div style="font-family: Georgia, serif; font-size: 40px; font-weight: 900; color: #F5C042; line-height: 1.05; letter-spacing: -0.8px; text-shadow: 0 4px 16px rgba(245, 192, 66, 0.35);">${c.titleSerif || 'the wheel'}</div>
+          </div>
+
+          <!-- Wheel Assembly Mount on Violet Cabinet -->
+          <div style="position: relative; width: 280px; height: 350px; margin: 0 auto; background: #3C1E70; border-radius: 28px; padding: 18px 10px 14px; box-shadow: 0 10px 35px rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; border: 2px solid #5B21B6;">
+            
+            <!-- Flanking Cabinet Screws -->
+            <div style="position: absolute; top: 12px; left: 12px; width: 6px; height: 6px; border-radius: 50%; background: #6D28D9; border: 1px solid #7C3AED;"></div>
+            <div style="position: absolute; top: 12px; right: 12px; width: 6px; height: 6px; border-radius: 50%; background: #6D28D9; border: 1px solid #7C3AED;"></div>
+
+            <!-- Wheel Container -->
+            <div style="position: relative; width: 250px; height: 250px;">
+              <!-- Downward Pointing Golden Arrow Peg at Top (12 o'clock) -->
+              <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); z-index: 20; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 24px solid #F5C042; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));"></div>
+              
+              <!-- Outer Glowing Rim with "YOU WON" flashing ring -->
+              <div id="credWinGlowRim" style="position: absolute; inset: -4px; border-radius: 50%; border: 3px solid #F5C042; box-shadow: 0 0 20px rgba(245, 192, 66, 0.5); pointer-events: none; z-index: 15;"></div>
+
+              <!-- Canvas Wheel -->
+              <canvas id="credWheelCanvas" width="250" height="250" style="border-radius: 50%; box-shadow: 0 0 0 6px #130D24, 0 10px 25px rgba(0,0,0,0.5);"></canvas>
+
+              <!-- Center Metallic Hub Cap -->
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 72px; height: 72px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFFFFF, #D1D5DB 60%, #9CA3AF 100%); border: 3px solid #E5E7EB; box-shadow: 0 4px 14px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 18; text-align: center; padding: 4px;">
+                <span style="font-family: sans-serif; font-size: 7.5px; font-weight: 900; color: #1F2937; line-height: 1; letter-spacing: 0.4px;">${c.partnerName || 'BOMBAY SHAVING COMPANY'}</span>
+              </div>
+
+              <!-- Animated Floating Voucher Ticket Flyout (Appears upon win) -->
+              <div id="credFlyingVoucher" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.3); z-index: 30; width: 100px; height: 115px; background: #22C55E; border-radius: 12px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.9); display: none; align-items: center; justify-content: center; cursor: pointer;">
+                <span style="font-size: 38px; color: #FFFFFF;">★</span>
+              </div>
+            </div>
+
+            <!-- Elevated 3D Golden Button: "SPIN" -->
+            <button id="credMainSpinBtn" class="gw-btn-press" style="margin-top: 18px; width: 170px; height: 48px; border-radius: 14px; border: none; background: linear-gradient(180deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%); color: #422006; font-size: 17px; font-weight: 900; letter-spacing: 1px; cursor: pointer; box-shadow: 0 6px 0 #854D0E, 0 10px 20px rgba(0,0,0,0.4); text-transform: uppercase;">
+              SPIN
+            </button>
+          </div>
+
+          <!-- Bottom Details Link -->
+          <div style="text-align: center; margin-top: 8px;">
+            <span style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 4px 14px; font-size: 11px; color: #94A3B8; cursor: pointer;">
+              <i class="fa-solid fa-circle-info"></i> details
+            </span>
+          </div>
+
+        </div>
+      `;
+
+      // Canvas Wheel Drawing
+      const cv = mount.querySelector('#credWheelCanvas');
+      const cctx = cv.getContext('2d');
+      const arc = (Math.PI * 2) / 4; // 4 quadrants
+
+      function drawWheel() {
+        cctx.clearRect(0, 0, 250, 250);
+        cctx.save();
+        cctx.translate(125, 125);
+        cctx.rotate(currentAngle);
+
+        segments.forEach((seg, i) => {
+          const a = i * arc;
+          cctx.beginPath();
+          cctx.moveTo(0, 0);
+          cctx.arc(0, 0, 122, a, a + arc);
+          cctx.closePath();
+          cctx.fillStyle = seg.color;
+          cctx.fill();
+          cctx.strokeStyle = '#181126';
+          cctx.lineWidth = 3;
+          cctx.stroke();
+
+          // Render Text rotated radially
+          cctx.save();
+          cctx.rotate(a + arc / 2);
+          cctx.textAlign = 'right';
+          cctx.fillStyle = seg.text || '#1E1B18';
+          cctx.font = '800 11px -apple-system, sans-serif';
+          
+          const lines = seg.label.split('\n');
+          if (lines.length > 1) {
+            cctx.fillText(lines[0], 110, -2);
+            cctx.font = '900 12.5px -apple-system, sans-serif';
+            cctx.fillText(lines[1], 110, 13);
+          } else {
+            cctx.fillText(seg.label, 110, 4);
+          }
+          cctx.restore();
+        });
+
+        cctx.restore();
+      }
+
+      drawWheel();
+
+      // Spin Trigger
+      const spinBtn = mount.querySelector('#credMainSpinBtn');
+      spinBtn.onclick = () => {
+        if (isSpinning) return;
+        isSpinning = true;
+        spinBtn.style.opacity = '0.6';
+        spinBtn.style.pointerEvents = 'none';
+
+        // Play real extracted CRED wheel sound
+        if (c.soundEnabled !== false) snd.playCredWheelSpin();
+
+        const cost = Number(c.spinCostCoins || 3000);
+        coins = Math.max(0, coins - cost);
+        mount.querySelector('#credCoinBalance').innerText = coins.toLocaleString();
+
+        const start = performance.now();
+        const initAngle = currentAngle;
+        const targetRotations = 5 + Math.random() * 3;
+        const totalDelta = targetRotations * Math.PI * 2;
+        const duration = 4000;
+
+        function animateWheel(now) {
+          const p = Math.min((now - start) / duration, 1);
+          // Ease-out quintic deceleration
+          const ease = 1 - Math.pow(1 - p, 5);
+          currentAngle = initAngle + totalDelta * ease;
+          drawWheel();
+
+          if (p < 1) {
+            requestAnimationFrame(animateWheel);
+          } else {
+            isSpinning = false;
+            // Determine winner quadrant
+            const normalized = ((currentAngle % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+            const quadrant = Math.floor(((Math.PI * 2) - normalized + Math.PI / 4) / arc) % 4;
+            wonSegment = segments[quadrant] || segments[0];
+
+            // Win celebration
+            if (c.soundEnabled !== false) snd.playCredWheelWin();
+            fireConfetti(['#F5C042', '#22C55E', '#D946EF', '#FFFFFF']);
+
+            const glowRim = mount.querySelector('#credWinGlowRim');
+            if (glowRim) {
+              glowRim.style.borderColor = '#22C55E';
+              glowRim.style.boxShadow = '0 0 25px #22C55E';
+            }
+
+            // Flyout voucher animation
+            const flyer = mount.querySelector('#credFlyingVoucher');
+            if (flyer) {
+              flyer.style.display = 'flex';
+              flyer.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+              setTimeout(() => {
+                flyer.style.transform = 'translate(-50%, -50%) scale(1.4)';
+              }, 50);
+              setTimeout(() => {
+                showVoucherModal = true;
+                renderView();
+              }, 1200);
+            } else {
+              setTimeout(() => {
+                showVoucherModal = true;
+                renderView();
+              }, 800);
+            }
+
+            ctx.emit('cred_wheel_won', { widgetId: widget.id, prize: wonSegment.label });
+          }
+        }
+        requestAnimationFrame(animateWheel);
+      };
+    }
+
+    renderView();
+  }
+
+  // =========================================================================
+  // 9. CRED 3D ARCADE SLOT MACHINE (1:1 with ScreenRecording 11-16-2026 20-30-09)
+  // =========================================================================
+  function renderCredSlotMachine(mount, widget, ctx) {
+    const c = widget.config;
+    const snd = ctx.sound;
+    let coins = Number(c.coins || 563052);
+    let cashback = Number(c.cashback || 77);
+    let spinsLeft = Number(c.spinsLeft || 9);
+    let isSpinning = false;
+    let voucherDispensed = false;
+    let showWinOverlay = false;
+
+    // Slot Reel Symbols
+    const symbols = ['💎', '🔴', '🪙', '🏏', '🍒', '💰'];
+
+    // Current displayed symbols for the 3 columns (3 rows each)
+    let reel1 = ['💎', '🔴', '🪙'];
+    let reel2 = ['🔴', '🏏', '🍒'];
+    let reel3 = ['🔴', '🍒', '💰'];
+
+    function renderView() {
+      mount.innerHTML = `
+        <div class="gw-phone-frame" style="background: radial-gradient(circle at 50% 30%, #064E3B 0%, #022C22 55%, #051A14 100%); color: #FFFFFF; padding: 12px 14px 18px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+          
+          <!-- Top App Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+            <div style="display: flex; gap: 8px;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">✕</div>
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;"><i class="fa-solid fa-volume-high"></i></div>
+            </div>
+
+            <!-- Currency Badges -->
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <div style="background: #141A22; border: 1px solid rgba(234, 179, 8, 0.4); border-radius: 16px; padding: 4px 10px; display: flex; align-items: center; gap: 6px;">
+                <span style="width: 14px; height: 14px; border-radius: 50%; background: #F59E0B; display: inline-flex; align-items: center; justify-content: center; color: #FFF; font-size: 8px; font-weight: 900;">C</span>
+                <span id="credSlotCoins" style="font-size: 12px; font-weight: 800; color: #FDE047;">${coins.toLocaleString()}</span>
+              </div>
+              <div style="background: #141A22; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 4px 10px; display: flex; align-items: center; gap: 5px;">
+                <span style="font-size: 11px;">💵</span>
+                <span style="font-size: 12px; font-weight: 800; color: #E9D5FF;">₹${cashback}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Gift Box with Crown & Speech Bubble -->
+          <div style="display: flex; flex-direction: column; align-items: center; margin: 4px 0 -8px; z-index: 5;">
+            <!-- 3D Open Gift Box with Crown -->
+            <div style="font-size: 46px; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.6)); animation: gwFloatCoin 3s ease-in-out infinite;">
+              👑🎁
+            </div>
+            <!-- Speech Bubble Pill -->
+            <div style="background: rgba(18, 22, 29, 0.94); border: 1.5px solid rgba(255, 255, 255, 0.16); border-radius: 18px; padding: 7px 16px; font-size: 11.5px; font-weight: 700; color: #FFFFFF; text-align: center; max-width: 250px; line-height: 1.3; box-shadow: 0 4px 14px rgba(0,0,0,0.4); margin-top: -6px;">
+              ${c.eyebrow || 'win jackpot or get 30% off your next uber intercity ride'}
+            </div>
+          </div>
+
+          <!-- 3D Arcade Obsidian Slot Cabinet -->
+          <div style="position: relative; width: 285px; margin: 0 auto; background: #2A303C; border-radius: 28px 28px 20px 20px; padding: 16px 14px 14px; box-shadow: 0 16px 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.2); border: 2px solid #3F4654;">
+            
+            <!-- Mechanical Pull Lever on Right Side -->
+            <div id="credSlotLever" style="position: absolute; right: -22px; top: 90px; width: 22px; height: 95px; cursor: pointer; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+              <!-- Chrome Rod -->
+              <div style="position: absolute; left: 2px; top: 18px; width: 8px; height: 60px; background: linear-gradient(90deg, #E2E8F0, #94A3B8, #475569); border-radius: 4px; box-shadow: 2px 2px 6px rgba(0,0,0,0.4);"></div>
+              <!-- Sphere Knob -->
+              <div style="position: absolute; left: -3px; top: 0; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #F1F5F9, #64748B, #1E293B); box-shadow: 0 4px 8px rgba(0,0,0,0.6);"></div>
+              <!-- Cabinet Mount Base -->
+              <div style="position: absolute; left: 0; bottom: 8px; width: 14px; height: 20px; background: #1E293B; border-radius: 0 6px 6px 0;"></div>
+            </div>
+
+            <!-- Recessed Glass Display Window -->
+            <div style="position: relative; background: #0E1218; border-radius: 18px; padding: 12px 10px; border: 2.5px solid #1A202A; box-shadow: inset 0 4px 16px rgba(0,0,0,0.8); overflow: hidden;">
+              
+              <!-- Left/Right Triangular Payline Indicators -->
+              <div style="position: absolute; left: 2px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 10px solid #94A3B8; z-index: 10;"></div>
+              <div style="position: absolute; right: 2px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-right: 10px solid #94A3B8; z-index: 10;"></div>
+
+              <!-- 3 Reels Grid -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center;">
+                
+                <!-- Reel 1 -->
+                <div id="credReel1" style="display: flex; flex-direction: column; gap: 10px; border-right: 1px solid rgba(255,255,255,0.06);">
+                  ${reel1.map(sym => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${sym}</div>`).join('')}
+                </div>
+
+                <!-- Reel 2 -->
+                <div id="credReel2" style="display: flex; flex-direction: column; gap: 10px; border-right: 1px solid rgba(255,255,255,0.06);">
+                  ${reel2.map(sym => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${sym}</div>`).join('')}
+                </div>
+
+                <!-- Reel 3 -->
+                <div id="credReel3" style="display: flex; flex-direction: column; gap: 10px;">
+                  ${reel3.map(sym => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${sym}</div>`).join('')}
+                </div>
+
+              </div>
+
+              <!-- Win Glass Overlay Banner -->
+              <div id="credSlotWinOverlay" style="display: ${showWinOverlay ? 'flex' : 'none'}; position: absolute; inset: 0; background: rgba(14, 18, 24, 0.94); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; padding: 14px; text-align: center; z-index: 15; animation: gwPopIn 0.3s ease;">
+                <div style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">you won</div>
+                <div style="font-size: 15px; font-weight: 900; color: #FACC15; line-height: 1.35;">
+                  ${c.rewardTitle || '30% off your next uber intercity ride, up to ₹500'}
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Controls Row: Big Yellow Spin Button + Lilac Cost Button -->
+            <div style="display: flex; gap: 10px; align-items: center; margin: 14px 0 10px;">
+              <!-- Large Yellow Spin Button -->
+              <button id="credSlotSpinBtn" class="gw-btn-press" style="flex: 1.6; height: 50px; border-radius: 12px; border: none; background: linear-gradient(180deg, #FDE047 0%, #EAB308 60%, #CA8A04 100%); box-shadow: 0 5px 0 #854D0E, 0 8px 14px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #92400E;"></span>
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #92400E;"></span>
+              </button>
+
+              <!-- Raised Lilac Cost Button -->
+              <div style="flex: 1; height: 50px; border-radius: 50%; background: linear-gradient(180deg, #E9D5FF 0%, #C084FC 60%, #9333EA 100%); box-shadow: 0 5px 0 #581C87, 0 8px 14px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                <span style="font-size: 10px; color: #3B0764; font-weight: 800; line-height: 1;">🪙</span>
+                <span style="font-size: 11px; font-weight: 900; color: #3B0764; line-height: 1.2;">${c.spinCost || 9000}</span>
+              </div>
+            </div>
+
+            <!-- Status Indicator Bar -->
+            <div style="background: #1C222C; border-radius: 12px; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-weight: 700; color: #94A3B8;">
+              <span id="credSpinsCount">${spinsLeft} / ${c.maxSpins || 10} SPINS LEFT</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span>${c.playersCount || '43,745'} played</span>
+                <span style="font-size: 12px;">👥</span>
+              </div>
+            </div>
+
+            <!-- Mechanical Ticket Dispenser Slot -->
+            <div style="position: relative; margin-top: 14px; width: 100%; height: 6px; background: #000000; border-radius: 3px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);">
+              
+              <!-- Green Voucher Ticket Sliding Out -->
+              <div id="credDispensedVoucher" class="gw-btn-press" style="position: absolute; left: 50%; transform: translateX(-50%); top: 4px; width: 140px; height: ${voucherDispensed ? '70px' : '0px'}; background: #22C55E; border-radius: 0 0 10px 10px; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.45); overflow: hidden; transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1.5px solid #86EFAC; border-top: none;">
+                <div style="width: 24px; height: 12px; border-radius: 0 0 12px 12px; background: #000000; margin-top: -6px;"></div>
+                <div style="font-size: 11px; font-weight: 800; color: #022C22; margin-top: 4px;">CLAIM VOUCHER</div>
+                <div style="font-size: 9.5px; font-weight: 700; color: #064E3B;">CODE: ${c.couponCode || 'UBER30'}</div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom Details Link -->
+          <div style="text-align: center; margin-top: 24px;">
+            <span style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 4px 14px; font-size: 11px; color: #94A3B8; cursor: pointer;">
+              <i class="fa-solid fa-circle-info"></i> details
+            </span>
+          </div>
+
+        </div>
+      `;
+
+      // Spin Mechanics
+      const triggerSpin = () => {
+        if (isSpinning || spinsLeft <= 0) return;
+        isSpinning = true;
+        showWinOverlay = false;
+        voucherDispensed = false;
+
+        // Pull Lever Animation
+        const lever = mount.querySelector('#credSlotLever');
+        if (lever) {
+          lever.style.transform = 'rotate(45deg) translateY(15px)';
+          setTimeout(() => { lever.style.transform = 'none'; }, 350);
+        }
+
+        // Audio
+        if (c.soundEnabled !== false) snd.playCredSlotSpin();
+
+        spinsLeft--;
+        coins = Math.max(0, coins - Number(c.spinCost || 9000));
+        mount.querySelector('#credSlotCoins').innerText = coins.toLocaleString();
+        mount.querySelector('#credSpinsCount').innerText = `${spinsLeft} / ${c.maxSpins || 10} SPINS LEFT`;
+
+        const r1 = mount.querySelector('#credReel1');
+        const r2 = mount.querySelector('#credReel2');
+        const r3 = mount.querySelector('#credReel3');
+
+        let ticks = 0;
+        const rollInterval = setInterval(() => {
+          ticks++;
+          r1.innerHTML = [symbols[Math.floor(Math.random() * symbols.length)], symbols[Math.floor(Math.random() * symbols.length)], symbols[Math.floor(Math.random() * symbols.length)]].map(s => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center; filter: blur(1px);">${s}</div>`).join('');
+          r2.innerHTML = [symbols[Math.floor(Math.random() * symbols.length)], symbols[Math.floor(Math.random() * symbols.length)], symbols[Math.floor(Math.random() * symbols.length)]].map(s => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center; filter: blur(1px);">${s}</div>`).join('');
+          r3.innerHTML = [symbols[Math.floor(Math.random() * symbols.length)], symbols[Math.floor(Math.random() * symbols.length)], symbols[Math.floor(Math.random() * symbols.length)]].map(s => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center; filter: blur(1px);">${s}</div>`).join('');
+        }, 70);
+
+        // Sequence reel stopping
+        setTimeout(() => {
+          // Stop Reel 1 (Diamonds)
+          r1.innerHTML = ['💎', '💎', '🔴'].map(s => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center;">${s}</div>`).join('');
+          if (c.soundEnabled !== false) snd.playOdometerTick();
+        }, 1800);
+
+        setTimeout(() => {
+          // Stop Reel 2 (Diamonds)
+          r2.innerHTML = ['💎', '💎', '🏏'].map(s => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center;">${s}</div>`).join('');
+          if (c.soundEnabled !== false) snd.playOdometerTick();
+        }, 2400);
+
+        setTimeout(() => {
+          // Stop Reel 3 (Triple Jackpot / 30% Uber Win)
+          clearInterval(rollInterval);
+          r3.innerHTML = ['💎', '💎', '💰'].map(s => `<div style="font-size: 30px; height: 38px; display: flex; align-items: center; justify-content: center;">${s}</div>`).join('');
+          
+          isSpinning = false;
+          showWinOverlay = true;
+          voucherDispensed = true;
+
+          // Play Real Win Sound & Confetti
+          if (c.soundEnabled !== false) snd.playCredSlotWin();
+          fireConfetti(['#FACC15', '#22C55E', '#3B82F6', '#FFFFFF']);
+
+          // Show Overlay Banner
+          const overlay = mount.querySelector('#credSlotWinOverlay');
+          if (overlay) overlay.style.display = 'flex';
+
+          // Slide Voucher Down
+          const voucher = mount.querySelector('#credDispensedVoucher');
+          if (voucher) voucher.style.height = '70px';
+
+          ctx.emit('cred_slot_won', { widgetId: widget.id, reward: c.rewardTitle || '30% off Uber Intercity' });
+        }, 3000);
+      };
+
+      const spinBtn = mount.querySelector('#credSlotSpinBtn');
+      if (spinBtn) spinBtn.onclick = triggerSpin;
+
+      const lever = mount.querySelector('#credSlotLever');
+      if (lever) lever.onclick = triggerSpin;
+
+      const voucher = mount.querySelector('#credDispensedVoucher');
+      if (voucher) {
+        voucher.onclick = () => {
+          navigator.clipboard?.writeText(c.couponCode || 'UBER30').catch(() => {});
+          alert(`🎉 Reward Voucher Claimed!\nPromo Code: ${c.couponCode || 'UBER30'} copied to clipboard!`);
+        };
+      }
+    }
+
+    renderView();
   }
 
   // =========================================================================
@@ -1743,6 +2181,7 @@
         case 'paytm_spin_win': return renderPaytmSpinWin(mountEl, widget, ctx);
         case 'duolingo_flow': return renderDuolingoFlow(mountEl, widget, ctx);
         case 'cred_wheel': return renderCredWheel(mountEl, widget, ctx);
+        case 'cred_slot_machine': return renderCredSlotMachine(mountEl, widget, ctx);
         case 'gamify_leaderboard': return renderGamifyLeaderboard(mountEl, widget, ctx);
         default:
           mountEl.innerHTML = `<div style="color:#94A3B8;">Unknown widget type: ${widget.type}</div>`;

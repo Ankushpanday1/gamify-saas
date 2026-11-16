@@ -123,26 +123,48 @@ function getDefaultWidgets() {
     {
       id: 'cred_wheel_07',
       type: 'cred_wheel',
-      name: 'CRED Obsidian Spin Wheel',
-      appSource: 'CRED Luxury Kit',
+      name: 'CRED Spin the Wheel (Luxury Partner)',
+      appSource: 'CRED Rewards (ScreenRecording 11-16 20-31)',
       status: 'active',
       config: {
-        bgTone: '#0C0D11',
-        accentGreen: '#00E599',
-        goldTone: '#E5B869',
-        spinCostCoins: 1000,
-        decelerationDurationMs: 3800,
+        titleScript: 'spin',
+        titleSerif: 'the wheel',
+        partnerName: 'BOMBAY SHAVING COMPANY',
+        coins: 560052,
+        cashback: 77,
+        tickets: 4,
+        spinCostCoins: 3000,
         segments: [
-          { label: '500 COINS', color: '#161821', text: '#FFFFFF' },
-          { label: '₹100 CASH', color: '#E5B869', text: '#0C0D11' },
-          { label: 'JACKPOT', color: '#00E599', text: '#0C0D11' },
-          { label: '2X BOOSTER', color: '#1D212F', text: '#FFFFFF' },
-          { label: 'MYSTERY', color: '#2B3144', text: '#E5B869' },
-          { label: '5000 COINS', color: '#161821', text: '#FFFFFF' }
+          { label: '2-in-1 trimmer at ₹899', color: '#D946EF', text: '#1E1B18', price: 899 },
+          { label: '2-in-1 trimmer at ₹999', color: '#F97316', text: '#1E1B18', price: 999 },
+          { label: '2-in-1 trimmer at ₹1,099', color: '#84CC16', text: '#1E1B18', price: 1099 },
+          { label: '2-in-1 trimmer at ₹1,199', color: '#06B6D4', text: '#1E1B18', price: 1199 }
         ],
+        couponCode: 'CRED899',
+        rewardImage: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=600&q=80',
         soundEnabled: true
       },
-      stats: { impressions: 4500, claims: 3910, conversionRate: '86.8%' }
+      stats: { impressions: 5800, claims: 4920, conversionRate: '84.8%' }
+    },
+    {
+      id: 'cred_slot_09',
+      type: 'cred_slot_machine',
+      name: 'CRED 3D Arcade Slot Machine',
+      appSource: 'CRED Jackpot (ScreenRecording 11-16 20-30)',
+      status: 'active',
+      config: {
+        eyebrow: 'win jackpot or get 30% off your next uber intercity ride',
+        coins: 563052,
+        cashback: 77,
+        spinCost: 9000,
+        spinsLeft: 9,
+        maxSpins: 10,
+        playersCount: '43,745',
+        rewardTitle: '30% off your next uber intercity ride, up to ₹500',
+        couponCode: 'UBER30',
+        soundEnabled: true
+      },
+      stats: { impressions: 7120, claims: 5890, conversionRate: '82.7%' }
     },
     {
       id: 'gamify_leaderboard_08',
@@ -178,7 +200,7 @@ function loadDB() {
   if (fs.existsSync(DB_FILE)) {
     try {
       const parsed = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-      if (parsed && Array.isArray(parsed.widgets) && parsed.widgets.length >= 8) {
+      if (parsed && Array.isArray(parsed.widgets) && parsed.widgets.length >= 9) {
         return parsed;
       }
     } catch (_) {}

@@ -367,10 +367,17 @@
         fields += fieldInput('streakCount', 'Streak Day Count', c.streakCount, 'number');
         fields += fieldSelect('lottieTier', 'Rare Chest Tier', c.lottieTier, [['gold', 'Gold Rare Chest'], ['silver', 'Silver Chest'], ['bronze', 'Bronze Chest']]);
       } else if (w.type === 'cred_wheel') {
-        fields += fieldInput('bgTone', 'Obsidian Background', c.bgTone, 'color');
-        fields += fieldInput('accentGreen', 'Accent Neon Green', c.accentGreen, 'color');
-        fields += fieldInput('goldTone', 'Brushed Gold Rim', c.goldTone, 'color');
-        fields += fieldInput('spinCostCoins', 'Spin Cost (CRED Coins)', c.spinCostCoins, 'number');
+        fields += fieldInput('titleScript', 'Script Eyebrow (e.g. spin)', c.titleScript || 'spin');
+        fields += fieldInput('titleSerif', 'Main Title (e.g. the wheel)', c.titleSerif || 'the wheel');
+        fields += fieldInput('partnerName', 'Partner Brand Hub Logo', c.partnerName || 'BOMBAY SHAVING COMPANY');
+        fields += fieldInput('couponCode', 'Winning Promo Code', c.couponCode || 'CRED899');
+        fields += fieldInput('spinCostCoins', 'Spin Cost (Coins)', c.spinCostCoins || 3000, 'number');
+      } else if (w.type === 'cred_slot_machine') {
+        fields += fieldInput('eyebrow', 'Speech Bubble Text', c.eyebrow);
+        fields += fieldInput('rewardTitle', 'Winning Reward Title', c.rewardTitle);
+        fields += fieldInput('couponCode', 'Dispensed Voucher Code', c.couponCode);
+        fields += fieldInput('spinCost', 'Spin Cost (Coins)', c.spinCost || 9000, 'number');
+        fields += fieldInput('spinsLeft', 'Spins Remaining', c.spinsLeft || 9, 'number');
       } else if (w.type === 'gamify_leaderboard') {
         fields += fieldInput('title', 'Leaderboard Title', c.title);
         fields += fieldSelect('activeTab', 'Default Active Tab', c.activeTab, [['Region', 'Region'], ['National', 'National'], ['Global', 'Global']]);

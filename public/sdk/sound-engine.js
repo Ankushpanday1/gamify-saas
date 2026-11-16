@@ -212,6 +212,23 @@
       osc.start(t);
       osc.stop(t + 0.17);
     }
+
+    // Real extracted CRED Slot & Wheel sounds
+    playCredSlotSpin() {
+      this.playMp3('/assets/cred_slot_spin.mp3', 0.85);
+    }
+
+    playCredSlotWin() {
+      this.playMp3('/assets/cred_slot_win.mp3', 0.9);
+    }
+
+    playCredWheelSpin() {
+      this.playMp3('/assets/cred_wheel_spin.mp3', 0.85);
+    }
+
+    playCredWheelWin() {
+      this.playMp3('/assets/cred_wheel_win.mp3', 0.9);
+    }
   }
 
   window.GamifySoundEngine = GamifySoundEngine;
