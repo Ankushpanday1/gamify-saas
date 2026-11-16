@@ -32,7 +32,7 @@
       },
       "stats": {
         "impressions": 5420,
-        "claims": 4312,
+        "claims": 4314,
         "conversionRate": "79.6%"
       }
     },
@@ -70,7 +70,7 @@
       },
       "stats": {
         "impressions": 3290,
-        "claims": 2481,
+        "claims": 2482,
         "conversionRate": "75.4%"
       }
     },
@@ -90,8 +90,8 @@
       },
       "stats": {
         "impressions": 4180,
-        "claims": 3123,
-        "conversionRate": "74.7%"
+        "claims": 3126,
+        "conversionRate": "74.8%"
       }
     },
     {
@@ -108,7 +108,7 @@
       },
       "stats": {
         "impressions": 6890,
-        "claims": 5941,
+        "claims": 5942,
         "conversionRate": "86.2%"
       }
     },
@@ -147,7 +147,7 @@
       },
       "stats": {
         "impressions": 7450,
-        "claims": 6322,
+        "claims": 6323,
         "conversionRate": "84.9%"
       }
     },
@@ -169,7 +169,7 @@
       },
       "stats": {
         "impressions": 9120,
-        "claims": 8141,
+        "claims": 8143,
         "conversionRate": "89.3%"
       }
     },
@@ -188,10 +188,30 @@
         "tickets": 4,
         "spinCostCoins": 3000,
         "segments": [
-          { "label": "2-in-1 trimmer at ₹899", "color": "#D946EF", "text": "#1E1B18", "price": 899 },
-          { "label": "2-in-1 trimmer at ₹999", "color": "#F97316", "text": "#1E1B18", "price": 999 },
-          { "label": "2-in-1 trimmer at ₹1,099", "color": "#84CC16", "text": "#1E1B18", "price": 1099 },
-          { "label": "2-in-1 trimmer at ₹1,199", "color": "#06B6D4", "text": "#1E1B18", "price": 1199 }
+          {
+            "label": "2-in-1 trimmer at ₹899",
+            "color": "#D946EF",
+            "text": "#1E1B18",
+            "price": 899
+          },
+          {
+            "label": "2-in-1 trimmer at ₹999",
+            "color": "#F97316",
+            "text": "#1E1B18",
+            "price": 999
+          },
+          {
+            "label": "2-in-1 trimmer at ₹1,099",
+            "color": "#84CC16",
+            "text": "#1E1B18",
+            "price": 1099
+          },
+          {
+            "label": "2-in-1 trimmer at ₹1,199",
+            "color": "#06B6D4",
+            "text": "#1E1B18",
+            "price": 1199
+          }
         ],
         "couponCode": "CRED899",
         "rewardImage": "https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=600&q=80",
@@ -199,7 +219,7 @@
       },
       "stats": {
         "impressions": 5800,
-        "claims": 4920,
+        "claims": 4921,
         "conversionRate": "84.8%"
       }
     },
@@ -223,7 +243,7 @@
       },
       "stats": {
         "impressions": 7120,
-        "claims": 5890,
+        "claims": 5891,
         "conversionRate": "82.7%"
       }
     },
@@ -418,6 +438,123 @@
         "widgetId": "cred_wheel_07"
       },
       "timestamp": "2026-11-10T18:09:17.566Z"
+    },
+    {
+      "id": "evt_1794859004524",
+      "userId": "demo_user_001",
+      "event": "duolingo_flow_completed",
+      "metadata": {
+        "widgetId": "duolingo_flow_06"
+      },
+      "timestamp": "2026-11-16T19:56:44.524Z"
+    },
+    {
+      "id": "evt_1794859011034",
+      "userId": "demo_user_001",
+      "event": "zepto_scratch_revealed",
+      "metadata": {
+        "widgetId": "zepto_scratch_01"
+      },
+      "timestamp": "2026-11-16T19:56:51.034Z"
+    },
+    {
+      "id": "evt_1794859035030",
+      "userId": "demo_user_001",
+      "event": "cred_wheel_won",
+      "metadata": {
+        "widgetId": "cred_wheel_07",
+        "prize": "2-in-1 trimmer at ₹1,099"
+      },
+      "timestamp": "2026-11-16T19:57:15.030Z"
+    },
+    {
+      "id": "evt_1794859047451",
+      "userId": "demo_user_001",
+      "event": "cred_slot_won",
+      "metadata": {
+        "widgetId": "cred_slot_09",
+        "reward": "30% off your next uber intercity ride, up to ₹500"
+      },
+      "timestamp": "2026-11-16T19:57:27.451Z"
+    },
+    {
+      "id": "evt_1794859064010",
+      "userId": "demo_user_001",
+      "event": "instaastro_points_earned",
+      "metadata": {
+        "widgetId": "instaastro_points_03",
+        "amount": 30
+      },
+      "timestamp": "2026-11-16T19:57:44.010Z"
+    },
+    {
+      "id": "evt_1794859066005",
+      "userId": "demo_user_001",
+      "event": "instaastro_points_earned",
+      "metadata": {
+        "widgetId": "instaastro_points_03",
+        "amount": 50
+      },
+      "timestamp": "2026-11-16T19:57:46.005Z"
+    },
+    {
+      "id": "evt_1794859067297",
+      "userId": "demo_user_001",
+      "event": "instaastro_points_earned",
+      "metadata": {
+        "widgetId": "instaastro_points_03",
+        "amount": 30
+      },
+      "timestamp": "2026-11-16T19:57:47.297Z"
+    },
+    {
+      "id": "evt_1794859075763",
+      "userId": "demo_user_001",
+      "event": "paytm_spin_won",
+      "metadata": {
+        "widgetId": "paytm_spin_05",
+        "prize": "₹100 Off Deal"
+      },
+      "timestamp": "2026-11-16T19:57:55.763Z"
+    },
+    {
+      "id": "evt_1794859087828",
+      "userId": "demo_user_001",
+      "event": "paytm_chest_opened",
+      "metadata": {
+        "widgetId": "paytm_chest_04",
+        "rewardCoins": 31
+      },
+      "timestamp": "2026-11-16T19:58:07.828Z"
+    },
+    {
+      "id": "evt_1794859111739",
+      "userId": "demo_user_001",
+      "event": "duolingo_flow_completed",
+      "metadata": {
+        "widgetId": "duolingo_flow_06"
+      },
+      "timestamp": "2026-11-16T19:58:31.739Z"
+    },
+    {
+      "id": "evt_1794859197938",
+      "userId": "demo_user_001",
+      "event": "mynaksh_streak_claimed",
+      "metadata": {
+        "widgetId": "mynaksh_checkin_02",
+        "day": 1,
+        "amount": 5
+      },
+      "timestamp": "2026-11-16T19:59:57.938Z"
+    },
+    {
+      "id": "evt_1794859237547",
+      "userId": "studio_preview",
+      "event": "zepto_scratch_revealed",
+      "metadata": {
+        "widgetId": "zepto_scratch_01"
+      },
+      "timestamp": "2026-11-16T20:00:37.547Z"
     }
   ]
 }

@@ -123,74 +123,26 @@ function getDefaultWidgets() {
     {
       id: 'cred_wheel_07',
       type: 'cred_wheel',
-      name: 'CRED Spin the Wheel (Luxury Partner)',
-      appSource: 'CRED Rewards (ScreenRecording 11-16 20-31)',
+      name: 'CRED Obsidian Spin Wheel',
+      appSource: 'CRED Luxury Kit',
       status: 'active',
       config: {
-        titleScript: 'spin',
-        titleSerif: 'the wheel',
-        partnerName: 'BOMBAY SHAVING COMPANY',
-        coins: 560052,
-        cashback: 77,
-        tickets: 4,
-        spinCostCoins: 3000,
+        bgTone: '#0C0D11',
+        accentGreen: '#00E599',
+        goldTone: '#E5B869',
+        spinCostCoins: 1000,
+        decelerationDurationMs: 3800,
         segments: [
-          { label: '2-in-1 trimmer at ₹899', color: '#D946EF', text: '#1E1B18', price: 899 },
-          { label: '2-in-1 trimmer at ₹999', color: '#F97316', text: '#1E1B18', price: 999 },
-          { label: '2-in-1 trimmer at ₹1,099', color: '#84CC16', text: '#1E1B18', price: 1099 },
-          { label: '2-in-1 trimmer at ₹1,199', color: '#06B6D4', text: '#1E1B18', price: 1199 }
-        ],
-        couponCode: 'CRED899',
-        rewardImage: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=600&q=80',
-        soundEnabled: true
-      },
-      stats: { impressions: 5800, claims: 4920, conversionRate: '84.8%' }
-    },
-    {
-      id: 'cred_slot_09',
-      type: 'cred_slot_machine',
-      name: 'CRED 3D Arcade Slot Machine',
-      appSource: 'CRED Jackpot (ScreenRecording 11-16 20-30)',
-      status: 'active',
-      config: {
-        eyebrow: 'win jackpot or get 30% off your next uber intercity ride',
-        coins: 563052,
-        cashback: 77,
-        spinCost: 9000,
-        spinsLeft: 9,
-        maxSpins: 10,
-        playersCount: '43,745',
-        rewardTitle: '30% off your next uber intercity ride, up to ₹500',
-        couponCode: 'UBER30',
-        soundEnabled: true
-      },
-      stats: { impressions: 7120, claims: 5890, conversionRate: '82.7%' }
-    },
-    {
-      id: 'gamify_leaderboard_08',
-      type: 'gamify_leaderboard',
-      name: 'Triple Podium Gamified Leaderboard',
-      appSource: 'Competitive Tier Leaderboard (Region / National / Global)',
-      status: 'active',
-      config: {
-        title: 'Leaderboard',
-        activeTab: 'Region',
-        tabs: ['Region', 'National', 'Global'],
-        metricLabel: 'PTS',
-        topThree: [
-          { rank: 1, name: 'Eiden', username: '@username', score: 2430, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', color: '#F59E0B' },
-          { rank: 2, name: 'Jackson', username: '@username', score: 1847, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80', color: '#38BDF8' },
-          { rank: 3, name: 'Emma Aria', username: '@username', score: 1674, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80', color: '#22C55E' }
-        ],
-        listPlayers: [
-          { rank: 4, name: 'Sebastian', username: '@username', score: 1124, trend: 'up', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80' },
-          { rank: 5, name: 'Jason', username: '@username', score: 875, trend: 'down', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80' },
-          { rank: 6, name: 'Natalie', username: '@username', score: 774, trend: 'up', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80' },
-          { rank: 7, name: 'Serenity', username: '@username', score: 723, trend: 'up', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80' }
+          { label: '500 COINS', color: '#161821', text: '#FFFFFF' },
+          { label: '₹100 CASH', color: '#E5B869', text: '#0C0D11' },
+          { label: 'JACKPOT', color: '#00E599', text: '#0C0D11' },
+          { label: '2X BOOSTER', color: '#1D212F', text: '#FFFFFF' },
+          { label: 'MYSTERY', color: '#2B3144', text: '#E5B869' },
+          { label: '5000 COINS', color: '#161821', text: '#FFFFFF' }
         ],
         soundEnabled: true
       },
-      stats: { impressions: 6120, claims: 4890, conversionRate: '79.9%' }
+      stats: { impressions: 4500, claims: 3910, conversionRate: '86.8%' }
     }
   ];
 }
@@ -200,10 +152,10 @@ function loadDB() {
   if (fs.existsSync(DB_FILE)) {
     try {
       const parsed = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-      if (parsed && Array.isArray(parsed.widgets) && parsed.widgets.length >= 9) {
+      if (parsed && Array.isArray(parsed.widgets) && parsed.widgets.length >= 7) {
         return parsed;
       }
-    } catch (_) {}
+    } catch (_) { }
   }
   const fresh = {
     projects: [{ id: 'proj_default', name: 'Default Workspace', apiKey: 'pk_live_duo_9821', createdAt: new Date().toISOString() }],
@@ -215,7 +167,7 @@ function loadDB() {
 }
 
 function saveDB(db) {
-  try { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); } catch (_) {}
+  try { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); } catch (_) { }
 }
 
 const DB = loadDB();
