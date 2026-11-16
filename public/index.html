@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gamify SaaS — Trophy.so Alternative with Real App Gamification Mechanics</title>
+  <title>Gamify — Gamification Platform &amp; Embed SDK</title>
+  <!-- Google Fonts: IBM Plex Sans & IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -12,92 +16,571 @@
   <script src="/sdk/widgets.js"></script>
   <style>
     :root {
-      --bg: #090B11;
-      --sidebar: #10131C;
-      --card: #151926;
-      --border: #232A3D;
-      --accent: #00E599;
-      --accent-hover: #00FFAB;
-      --text-main: #FFFFFF;
-      --text-sub: #94A3B8;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ds-bg: #0F1117;
+      --ds-sidebar: #171B24;
+      --ds-card: #1C2230;
+      --ds-card-hover: #222938;
+      --ds-border: #2B3240;
+      --ds-border-subtle: #222836;
+      --ds-accent: #4F83CC;
+      --ds-accent-hover: #6396D8;
+      --ds-success: #22A06B;
+      --ds-warning: #D99A35;
+      --ds-error: #D65B62;
+      --ds-text: #F1F3F5;
+      --ds-text-secondary: #9AA4B2;
+      --ds-text-tertiary: #6B7280;
+      --ds-font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --ds-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--ds-bg);
+      color: var(--ds-text);
+      font-family: var(--ds-font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
 
     /* Sidebar */
-    aside { width: 256px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 14px; flex-shrink: 0; }
-    .brand-wrap { display: flex; align-items: center; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-    .brand-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00E599, #1CB0F6); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #090B11; }
-    .brand-title { font-size: 16px; font-weight: 800; }
-    .brand-tag { font-size: 10px; background: rgba(0,229,153,0.15); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 4px; }
-    .nav-group-label { font-size: 10px; text-transform: uppercase; color: #64748B; font-weight: 800; letter-spacing: 0.8px; margin: 12px 0 6px 10px; }
-    .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: var(--text-sub); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-bottom: 3px; }
-    .nav-link:hover, .nav-link.active { background: #1B2133; color: #FFF; }
-    .nav-link.active { color: var(--accent); font-weight: 700; }
+    aside {
+      width: 250px;
+      background: var(--ds-sidebar);
+      border-right: 1px solid var(--ds-border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+      flex-shrink: 0;
+    }
 
-    .sidebar-api-key { margin-top: auto; background: #171C2B; border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
-    .api-key-label { font-size: 10px; color: var(--text-sub); margin-bottom: 4px; display: flex; justify-content: space-between; font-weight: 700; }
-    .api-key-box { font-family: var(--font-mono); font-size: 11px; color: var(--accent); background: #0B0E17; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 6px 14px;
+      border-bottom: 1px solid var(--ds-border);
+      margin-bottom: 12px;
+    }
 
-    /* Main */
-    main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    header { height: 60px; border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(16,19,28,0.8); flex-shrink: 0; }
-    .page-title h2 { font-size: 17px; font-weight: 800; }
-    .header-actions { display: flex; align-items: center; gap: 10px; }
-    .hdr-btn { background: #171C2B; border: 1px solid var(--border); color: #CBD5E1; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-    .hdr-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--ds-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #FFFFFF;
+    }
 
-    .content-area { flex: 1; overflow-y: auto; padding: 20px 24px 40px; }
+    .brand-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--ds-text);
+    }
 
-    /* Metrics */
-    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-    .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
-    .metric-title { font-size: 11px; color: var(--text-sub); font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 6px; }
-    .metric-val { font-size: 24px; font-weight: 900; }
+    .brand-tag {
+      font-size: 11px;
+      font-family: var(--ds-font-mono);
+      background: rgba(79, 131, 204, 0.15);
+      color: var(--ds-accent);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+
+    .nav-group-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--ds-text-tertiary);
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      margin: 14px 0 6px 8px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--ds-text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 2px;
+      border: 1px solid transparent;
+    }
+
+    .nav-link i {
+      font-size: 13px;
+      color: var(--ds-text-secondary);
+      width: 16px;
+      text-align: center;
+    }
+
+    .nav-link:hover {
+      background: var(--ds-card);
+      color: var(--ds-text);
+    }
+
+    .nav-link.active {
+      background: rgba(79, 131, 204, 0.12);
+      border-color: rgba(79, 131, 204, 0.25);
+      color: var(--ds-text);
+      font-weight: 600;
+    }
+
+    .nav-link.active i {
+      color: var(--ds-accent);
+    }
+
+    .badge-subtle {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: auto;
+      background: rgba(79, 131, 204, 0.18);
+      color: var(--ds-accent);
+    }
+
+    .sidebar-api-key {
+      margin-top: auto;
+      background: var(--ds-card);
+      border: 1px solid var(--ds-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .api-key-label {
+      font-size: 11px;
+      color: var(--ds-text-tertiary);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+    }
+
+    .api-key-box {
+      font-family: var(--ds-font-mono);
+      font-size: 11px;
+      color: var(--ds-accent);
+      background: var(--ds-bg);
+      border: 1px solid var(--ds-border);
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      word-break: break-all;
+    }
+    .api-key-box:hover {
+      border-color: var(--ds-accent);
+    }
+
+    /* Main Area */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--ds-bg);
+    }
+
+    header {
+      height: 52px;
+      border-bottom: 1px solid var(--ds-border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--ds-sidebar);
+      flex-shrink: 0;
+    }
+
+    .page-title h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ds-text);
+      letter-spacing: -0.1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hdr-btn {
+      background: var(--ds-card);
+      border: 1px solid var(--ds-border);
+      color: var(--ds-text-secondary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .hdr-btn:hover {
+      border-color: var(--ds-accent);
+      color: var(--ds-text);
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px 32px;
+    }
+
+    /* Metrics Grid */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric-card {
+      background: var(--ds-card);
+      border: 1px solid var(--ds-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .metric-title {
+      font-size: 11px;
+      color: var(--ds-text-tertiary);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .metric-val {
+      font-family: var(--ds-font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ds-text);
+    }
 
     /* Studio Layout */
-    .saas-layout { display: grid; grid-template-columns: 310px 1fr; gap: 20px; min-height: 620px; }
-    .widgets-pane, .studio-pane { background: var(--card); border: 1px solid var(--border); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; }
-    .pane-header { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-    .widgets-list { flex: 1; overflow-y: auto; padding: 10px; }
+    .saas-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 16px;
+      min-height: 620px;
+    }
 
-    .widget-item-btn { width: 100%; background: #11141E; border: 1px solid transparent; border-radius: 12px; padding: 11px 12px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 11px; margin-bottom: 7px; transition: all 0.15s; }
-    .widget-item-btn:hover { background: #1A2030; }
-    .widget-item-btn.selected { background: #1D2436; border-color: var(--accent); }
-    .widget-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .widget-info h4 { font-size: 12.5px; font-weight: 800; color: #FFF; margin-bottom: 2px; }
-    .widget-info p { font-size: 10.5px; color: var(--text-sub); }
+    .widgets-pane, .studio-pane {
+      background: var(--ds-card);
+      border: 1px solid var(--ds-border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-    /* Studio Tabs */
-    .studio-tabs { display: flex; border-bottom: 1px solid var(--border); background: #11141E; padding: 0 12px; justify-content: space-between; align-items: center; }
-    .studio-tab-btn { background: transparent; border: none; padding: 13px 16px; font-size: 12.5px; font-weight: 700; color: var(--text-sub); cursor: pointer; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 7px; }
-    .studio-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .pane-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--ds-border);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--ds-sidebar);
+    }
 
-    .studio-body { flex: 1; display: grid; grid-template-columns: 320px 1fr; overflow: hidden; }
-    .customizer-form { padding: 18px; border-right: 1px solid var(--border); overflow-y: auto; background: #121622; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 10.5px; font-weight: 800; color: #CBD5E1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-    .form-input { width: 100%; background: #0B0E17; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: #FFF; font-size: 12.5px; outline: none; }
-    .form-input:focus { border-color: var(--accent); }
-    .color-row { display: flex; gap: 8px; align-items: center; }
-    .color-swatch { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; background: none; padding: 0; }
+    .widgets-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
 
-    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-    .save-config-btn { flex: 1; height: 42px; background: var(--accent); color: #090B11; border: none; border-radius: 8px; font-weight: 900; font-size: 12.5px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .save-config-btn:hover { background: var(--accent-hover); }
-    .reset-config-btn { height: 42px; padding: 0 12px; background: #1E2435; color: #CBD5E1; border: 1px solid var(--border); border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+    .widget-item-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 9px 10px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+      transition: background 0.15s, border-color 0.15s;
+    }
 
-    .preview-sandbox { background: radial-gradient(circle at 50% 40%, #192033, #0C0F18); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; overflow-y: auto; }
-    .sandbox-badge { position: absolute; top: 12px; left: 16px; font-size: 10.5px; font-weight: 800; color: rgba(255,255,255,0.45); display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
+    .widget-item-btn:hover {
+      background: var(--ds-bg-hover);
+    }
 
-    .embed-drawer { display: none; padding: 24px; overflow-y: auto; grid-column: 1 / -1; background: #0E111A; }
-    .code-box { background: #080A10; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: var(--font-mono); font-size: 12px; line-height: 1.55; color: #E2E8F0; margin-bottom: 18px; position: relative; white-space: pre-wrap; }
-    .copy-btn { position: absolute; top: 10px; right: 10px; background: #1E2538; border: 1px solid var(--border); color: #FFF; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    .widget-item-btn.selected {
+      background: rgba(79, 131, 204, 0.12);
+      border-color: var(--ds-accent);
+    }
+
+    .widget-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--ds-sidebar);
+      border: 1px solid var(--ds-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--ds-accent);
+      flex-shrink: 0;
+    }
+
+    .widget-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ds-text);
+      margin-bottom: 1px;
+    }
+
+    .widget-info p {
+      font-size: 11px;
+      color: var(--ds-text-secondary);
+    }
+
+    /* Studio Header Tabs */
+    .studio-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--ds-border);
+      background: var(--ds-sidebar);
+      padding: 0 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .studio-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ds-text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 0;
+    }
+
+    .studio-tab-btn:hover {
+      color: var(--ds-text);
+    }
+
+    .studio-tab-btn.active {
+      color: var(--ds-accent);
+      border-bottom-color: var(--ds-accent);
+      font-weight: 600;
+    }
+
+    .studio-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      overflow: hidden;
+    }
+
+    .customizer-form {
+      padding: 16px;
+      border-right: 1px solid var(--ds-border);
+      overflow-y: auto;
+      background: var(--ds-sidebar);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ds-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 5px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--ds-bg);
+      border: 1px solid var(--ds-border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      color: var(--ds-text);
+      font-family: var(--ds-font-sans);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--ds-accent);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--ds-border);
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .save-config-btn {
+      flex: 1;
+      height: 36px;
+      background: var(--ds-accent);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .save-config-btn:hover {
+      background: var(--ds-accent-hover);
+    }
+
+    .reset-config-btn {
+      height: 36px;
+      padding: 0 12px;
+      background: var(--ds-card);
+      color: var(--ds-text-secondary);
+      border: 1px solid var(--ds-border);
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .reset-config-btn:hover {
+      border-color: var(--ds-border);
+      color: var(--ds-text);
+    }
+
+    .preview-sandbox {
+      background: var(--ds-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .sandbox-badge {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ds-text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .embed-drawer {
+      display: none;
+      padding: 20px;
+      overflow-y: auto;
+      grid-column: 1 / -1;
+      background: var(--ds-sidebar);
+    }
+
+    .code-box {
+      background: var(--ds-bg);
+      border: 1px solid var(--ds-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--ds-font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--ds-text);
+      margin-bottom: 16px;
+      position: relative;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--ds-card);
+      border: 1px solid var(--ds-border);
+      color: var(--ds-text-secondary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      color: var(--ds-text);
+      border-color: var(--ds-accent);
+    }
 
     /* Events Log Drawer */
-    .events-panel { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; }
-    .event-row { display: flex; justify-content: space-between; padding: 10px 12px; background: #10131C; border-radius: 10px; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; }
+    .events-panel {
+      display: none;
+      background: var(--ds-card);
+      border: 1px solid var(--ds-border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .event-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--ds-sidebar);
+      border: 1px solid var(--ds-border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-family: var(--ds-font-mono);
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -105,44 +588,44 @@
   <aside>
     <div class="brand-wrap">
       <div class="brand-logo"><i class="fa-solid fa-trophy"></i></div>
-      <div class="brand-title">Gamify<span class="brand-tag">SaaS</span></div>
+      <div class="brand-title">Gamify<span class="brand-tag">v2.1</span></div>
     </div>
 
     <div class="nav-group-label">Platform</div>
-    <div class="nav-link active" id="navStudio" onclick="switchPage('studio', this)"><i class="fa-solid fa-layer-group"></i> Widget Studio</div>
+    <div class="nav-link active" id="navStudio" onclick="switchPage('studio', this)"><i class="fa-solid fa-sliders"></i> Widget Studio</div>
     <div class="nav-link" id="navEvents" onclick="switchPage('events', this)"><i class="fa-solid fa-bolt"></i> Live Event Log</div>
     <div class="nav-link" onclick="switchStudioTab('embed')"><i class="fa-solid fa-code"></i> Embed SDK</div>
 
     <div class="nav-group-label">Screen-Recorded Kits</div>
-    <div class="nav-link" onclick="selectWidget('cred_slot_09')"><i class="fa-solid fa-dice" style="color:#F59E0B;"></i> CRED Slot Machine <span style="background:#F59E0B; color:#0F172A; font-size:9px; font-weight:800; padding:1px 5px; border-radius:4px; margin-left:auto;">NEW</span></div>
-    <div class="nav-link" onclick="selectWidget('cred_wheel_07')"><i class="fa-solid fa-gem" style="color:#E5B869;"></i> CRED Luxury Wheel</div>
-    <div class="nav-link" onclick="selectWidget('mynaksh_checkin_02')"><i class="fa-solid fa-coins" style="color:#F59E0B;"></i> MyNaksh 1:1 Streaks</div>
-    <div class="nav-link" onclick="selectWidget('gamify_leaderboard_08')"><i class="fa-solid fa-ranking-star" style="color:#00B9F5;"></i> Triple Podium Ranks</div>
-    <div class="nav-link" onclick="selectWidget('zepto_scratch_01')"><i class="fa-solid fa-wand-magic-sparkles" style="color:#DF7DFF;"></i> Zepto Scratch</div>
-    <div class="nav-link" onclick="selectWidget('duolingo_flow_06')"><i class="fa-solid fa-feather-pointed" style="color:#58CC02;"></i> Duolingo Flow</div>
-    <div class="nav-link" onclick="selectWidget('paytm_chest_04')"><i class="fa-solid fa-treasure-chest" style="color:#00B9F5;"></i> Paytm Chest Flip</div>
-    <div class="nav-link" onclick="selectWidget('paytm_spin_05')"><i class="fa-solid fa-dharmachakra" style="color:#38BDF8;"></i> Paytm Spin &amp; Win</div>
-    <div class="nav-link" onclick="selectWidget('instaastro_points_03')"><i class="fa-solid fa-star" style="color:#FFC700;"></i> InstaAstro Points</div>
+    <div class="nav-link" onclick="selectWidget('cred_slot_09')"><i class="fa-solid fa-dice"></i> CRED Slot Machine <span class="badge-subtle">NEW</span></div>
+    <div class="nav-link" onclick="selectWidget('cred_wheel_07')"><i class="fa-solid fa-gem"></i> CRED Luxury Wheel</div>
+    <div class="nav-link" onclick="selectWidget('mynaksh_checkin_02')"><i class="fa-solid fa-coins"></i> MyNaksh 1:1 Streaks</div>
+    <div class="nav-link" onclick="selectWidget('gamify_leaderboard_08')"><i class="fa-solid fa-ranking-star"></i> Triple Podium Ranks</div>
+    <div class="nav-link" onclick="selectWidget('zepto_scratch_01')"><i class="fa-solid fa-wand-magic-sparkles"></i> Zepto Scratch</div>
+    <div class="nav-link" onclick="selectWidget('duolingo_flow_06')"><i class="fa-solid fa-feather-pointed"></i> Duolingo Flow</div>
+    <div class="nav-link" onclick="selectWidget('paytm_chest_04')"><i class="fa-solid fa-treasure-chest"></i> Paytm Chest Flip</div>
+    <div class="nav-link" onclick="selectWidget('paytm_spin_05')"><i class="fa-solid fa-dharmachakra"></i> Paytm Spin &amp; Win</div>
+    <div class="nav-link" onclick="selectWidget('instaastro_points_03')"><i class="fa-solid fa-star"></i> InstaAstro Points</div>
 
-    <div class="nav-group-label">Live Playground &amp; Rewards</div>
-    <div class="nav-link" onclick="window.location.href='/live'"><i class="fa-solid fa-gamepad" style="color:#EC4899;"></i> Live PlayZone App <span style="background:#EC4899; color:#fff; font-size:9px; font-weight:800; padding:1px 5px; border-radius:4px; margin-left:auto;">HOT</span></div>
-    <div class="nav-link" onclick="window.GamifyStickers && window.GamifyStickers.openAlbum()"><i class="fa-solid fa-book-bookmark" style="color:#8B5CF6;"></i> Sticker Album (15)</div>
+    <div class="nav-group-label">Playground &amp; Rewards</div>
+    <div class="nav-link" onclick="window.location.href='/live'"><i class="fa-solid fa-gamepad"></i> Live PlayZone App <span class="badge-subtle">HOT</span></div>
+    <div class="nav-link" onclick="window.GamifyStickers && window.GamifyStickers.openAlbum()"><i class="fa-solid fa-book-bookmark"></i> Sticker Album (15)</div>
 
     <div class="sidebar-api-key">
-      <div class="api-key-label"><span>API KEY</span><span style="color:#00E599;">LIVE</span></div>
+      <div class="api-key-label"><span>API KEY</span><span style="color:var(--ds-success);">ACTIVE</span></div>
       <div class="api-key-box" onclick="copyText('pk_live_duo_9821')">pk_live_duo_9821</div>
     </div>
   </aside>
 
   <main>
     <header>
-      <div class="page-title"><h2>Trophy.so-Style Gamification Studio (1:1 Screen Recording Faithful)</h2></div>
+      <div class="page-title"><h2>Gamification Management Studio</h2></div>
       <div class="header-actions">
         <button class="hdr-btn" id="globalMuteBtn" onclick="toggleGlobalSound()">
-          <i class="fa-solid fa-volume-high" style="color:#00E599;"></i> Sound: ON
+          <i class="fa-solid fa-volume-high" style="color:var(--ds-accent);"></i> Sound: ON
         </button>
         <button class="hdr-btn" onclick="switchStudioTab('embed')">
-          <i class="fa-solid fa-code"></i> Get 1-Line Embed
+          <i class="fa-solid fa-code"></i> Embed Code
         </button>
       </div>
     </header>
@@ -151,27 +634,27 @@
       <!-- Top Metrics -->
       <div class="metrics-row">
         <div class="metric-card">
-          <div class="metric-title">IMPRESSIONS <i class="fa-solid fa-eye" style="color:#38BDF8;"></i></div>
+          <div class="metric-title">IMPRESSIONS <i class="fa-solid fa-eye" style="color:var(--ds-accent);"></i></div>
           <div class="metric-val" id="mImpressions">-</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">REWARDS CLAIMED <i class="fa-solid fa-gift" style="color:#58CC02;"></i></div>
+          <div class="metric-title">REWARDS CLAIMED <i class="fa-solid fa-gift" style="color:var(--ds-success);"></i></div>
           <div class="metric-val" id="mClaims">-</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">CONVERSION <i class="fa-solid fa-arrow-trend-up" style="color:#00E599;"></i></div>
+          <div class="metric-title">CONVERSION <i class="fa-solid fa-arrow-trend-up" style="color:var(--ds-accent);"></i></div>
           <div class="metric-val" id="mConversion">-</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">RECORDED KITS <i class="fa-solid fa-cubes" style="color:#E5B869;"></i></div>
-          <div class="metric-val" id="mCount">7 Kits</div>
+          <div class="metric-title">RECORDED KITS <i class="fa-solid fa-cubes" style="color:var(--ds-warning);"></i></div>
+          <div class="metric-val" id="mCount">9 Kits</div>
         </div>
       </div>
 
       <!-- Studio View -->
       <div class="saas-layout" id="studioView">
         <div class="widgets-pane">
-          <div class="pane-header"><span>Gamification Kits</span><span style="font-size:11px; color:#64748B;">7 Widgets</span></div>
+          <div class="pane-header"><span>Gamification Kits</span><span style="font-size:11px; color:var(--ds-text-tertiary);">9 Kits</span></div>
           <div class="widgets-list" id="widgetsListContainer"></div>
         </div>
 
@@ -182,7 +665,7 @@
               <button class="studio-tab-btn" id="tabEmbed" onclick="switchStudioTab('embed')"><i class="fa-solid fa-code"></i> Embed SDK</button>
               <button class="studio-tab-btn" id="tabJson" onclick="switchStudioTab('json')"><i class="fa-solid fa-file-code"></i> JSON Schema</button>
             </div>
-            <span id="saveToast" style="font-size:11px; font-weight:800; color:#00E599; opacity:0; transition:opacity 0.3s;">✓ Saved &amp; Deployed!</span>
+            <span id="saveToast" style="font-size:11px; font-weight:600; color:var(--ds-success); opacity:0; transition:opacity 0.2s;">✓ Configuration Saved</span>
           </div>
 
           <div class="studio-body">
@@ -190,8 +673,8 @@
 
             <div class="preview-sandbox" id="previewSandbox">
               <div class="sandbox-badge">
-                <i class="fa-solid fa-circle" style="color:#00E599; font-size:8px;"></i>
-                Interactive Live Preview (Click &amp; Play)
+                <i class="fa-solid fa-circle" style="color:var(--ds-success); font-size:7px;"></i>
+                Interactive Canvas Preview
               </div>
               <div id="sandboxMount"></div>
             </div>
@@ -203,8 +686,8 @@
 
       <!-- Events View -->
       <div class="events-panel" id="eventsView">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3>Live Triggered Gamification Events</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:14px; font-weight:600;">Live Triggered Events</h3>
           <button class="hdr-btn" onclick="refreshStats()"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
         <div id="eventsList"></div>
@@ -223,8 +706,8 @@
       soundEngine.setMuted(muted);
       const btn = document.getElementById('globalMuteBtn');
       btn.innerHTML = muted
-        ? '<i class="fa-solid fa-volume-xmark" style="color:#FF4B4B;"></i> Sound: OFF'
-        : '<i class="fa-solid fa-volume-high" style="color:#00E599;"></i> Sound: ON';
+        ? '<i class="fa-solid fa-volume-xmark" style="color:var(--ds-error);"></i> Sound: OFF'
+        : '<i class="fa-solid fa-volume-high" style="color:var(--ds-accent);"></i> Sound: ON';
     }
 
     async function loadWidgets() {
@@ -248,26 +731,28 @@
       const evBox = document.getElementById('eventsList');
       const evs = (json.stats.recentEvents || []).slice().reverse();
       evBox.innerHTML = evs.length
-        ? evs.map(e => `<div class="event-row"><span><b style="color:#00E599;">${e.event}</b> &bull; ${JSON.stringify(e.metadata || {})}</span><span style="color:#64748B;">${new Date(e.timestamp).toLocaleTimeString()}</span></div>`).join('')
-        : '<div style="color:#64748B; font-size:13px;">Interact with any widget in the Studio Sandbox to record live telemetry events here.</div>';
+        ? evs.map(e => `<div class="event-row"><span><b style="color:var(--ds-accent); font-weight:500;">${e.event}</b> &bull; ${JSON.stringify(e.metadata || {})}</span><span style="color:var(--ds-text-tertiary);">${new Date(e.timestamp).toLocaleTimeString()}</span></div>`).join('')
+        : '<div style="color:var(--ds-text-tertiary); font-size:13px;">Interact with any widget in the studio sandbox to record live telemetry events.</div>';
     }
 
     function renderWidgetsList() {
       const iconMap = {
-        zepto_scratch: ['fa-wand-magic-sparkles', 'rgba(223,125,255,0.16)', '#DF7DFF'],
-        mynaksh_checkin: ['fa-coins', 'rgba(245,158,11,0.16)', '#F59E0B'],
-        instaastro_points: ['fa-star', 'rgba(255,199,0,0.16)', '#FFC700'],
-        paytm_chest_scratch: ['fa-box-open', 'rgba(0,185,245,0.16)', '#00B9F5'],
-        paytm_spin_win: ['fa-dharmachakra', 'rgba(56,189,248,0.16)', '#38BDF8'],
-        duolingo_flow: ['fa-feather-pointed', 'rgba(88,204,2,0.16)', '#58CC02'],
-        cred_wheel: ['fa-gem', 'rgba(229,184,105,0.16)', '#E5B869']
+        zepto_scratch: 'fa-wand-magic-sparkles',
+        mynaksh_checkin: 'fa-coins',
+        instaastro_points: 'fa-star',
+        paytm_chest_scratch: 'fa-box-open',
+        paytm_spin_win: 'fa-dharmachakra',
+        duolingo_flow: 'fa-feather-pointed',
+        cred_wheel: 'fa-gem',
+        cred_slot_machine: 'fa-dice',
+        gamify_leaderboard: 'fa-ranking-star'
       };
       document.getElementById('widgetsListContainer').innerHTML = widgetsData.map(w => {
-        const [ic, bg, col] = iconMap[w.type] || ['fa-gift', '#222', '#FFF'];
+        const ic = iconMap[w.type] || 'fa-gift';
         const sel = selectedWidget && selectedWidget.id === w.id;
         return `
           <button class="widget-item-btn ${sel ? 'selected' : ''}" onclick="selectWidget('${w.id}')">
-            <div class="widget-icon" style="background:${bg}; color:${col};"><i class="fa-solid ${ic}"></i></div>
+            <div class="widget-icon"><i class="fa-solid ${ic}"></i></div>
             <div class="widget-info">
               <h4>${w.name}</h4>
               <p>${w.appSource}</p>
@@ -286,7 +771,6 @@
       if (activeTab !== 'design') renderEmbedOrJson();
     }
 
-    // Dynamic Customizer Form Generator for ALL 7 widgets
     function fieldInput(key, label, val, type = 'text') {
       if (type === 'color') {
         return `
@@ -302,7 +786,7 @@
         return `
           <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
             <label style="margin:0;">${label}</label>
-            <input type="checkbox" class="liveCfgBool" data-key="${key}" ${val !== false ? 'checked' : ''} style="width:18px; height:18px; accent-color:#00E599; cursor:pointer;">
+            <input type="checkbox" class="liveCfgBool" data-key="${key}" ${val !== false ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--ds-accent); cursor:pointer;">
           </div>`;
       }
       return `
@@ -325,14 +809,14 @@
     function renderCustomizerForm() {
       const w = selectedWidget;
       const c = w.config;
-      let fields = `<h3 style="font-size:13.5px; font-weight:800; margin-bottom:14px;">Customize ${w.name}</h3>`;
+      let fields = `<h3 style="font-size:13px; font-weight:600; margin-bottom:12px; color:var(--ds-text);">Configure: ${w.name}</h3>`;
 
       if (w.type === 'zepto_scratch') {
         fields += fieldInput('headerEyebrow', 'Eyebrow Heading', c.headerEyebrow);
         fields += fieldInput('headerTitle', 'Main Title', c.headerTitle);
         fields += fieldInput('brandWatermark', 'Foil Watermark Text', c.brandWatermark);
-        fields += fieldInput('foilTopColor', 'Foil Gradient Top', c.foilTopColor, 'color');
-        fields += fieldInput('foilBottomColor', 'Foil Gradient Bottom', c.foilBottomColor, 'color');
+        fields += fieldInput('foilTopColor', 'Foil Top Color', c.foilTopColor, 'color');
+        fields += fieldInput('foilBottomColor', 'Foil Bottom Color', c.foilBottomColor, 'color');
         fields += fieldInput('brandBadge', 'Reward Brand Badge', c.brandBadge);
         fields += fieldInput('rewardTitle', 'Reward Title', c.rewardTitle);
         fields += fieldInput('rewardSubtitle', 'Reward Subtitle', c.rewardSubtitle);
@@ -341,7 +825,7 @@
         fields += fieldInput('ctaColor', 'CTA Button Color', c.ctaColor, 'color');
         fields += fieldInput('scratchThresholdPercent', 'Reveal Threshold %', c.scratchThresholdPercent, 'number');
       } else if (w.type === 'mynaksh_checkin') {
-        fields += fieldSelect('initialView', 'Preview Screen', c.initialView, [['rewards_hub', 'Full Rewards Hub (1:1 Screenshot)'], ['celebrate', 'Golden Sunburst Celebration'], ['modal', 'Check-in Bottom Sheet']]);
+        fields += fieldSelect('initialView', 'Preview Screen', c.initialView, [['rewards_hub', 'Full Rewards Hub (1:1 Layout)'], ['celebrate', 'Celebration Modal'], ['modal', 'Check-in Sheet']]);
         fields += fieldInput('walletBalance', 'Wallet Balance (₹)', c.walletBalance, 'number');
         fields += fieldInput('activeDay', 'Active Streak Day (1-7)', c.activeDay, 'number');
         fields += fieldInput('dayRewardsCsv', '7-Day Rewards (comma separated)', (c.dayRewards || []).join(','));
@@ -350,37 +834,37 @@
         fields += fieldInput('mantraName', 'Mantra Card Title', c.mantraName);
         fields += fieldInput('mantraChant', 'Mantra Chant Text', c.mantraChant);
         fields += fieldInput('mantraReward', 'Mantra Reward (₹)', c.mantraReward, 'number');
-        fields += fieldInput('highlightColor', 'Active Neon Border', c.highlightColor, 'color');
-        fields += fieldInput('ctaColor', 'WhatsApp Button Color', c.ctaColor, 'color');
+        fields += fieldInput('highlightColor', 'Active Border Color', c.highlightColor, 'color');
+        fields += fieldInput('ctaColor', 'CTA Color', c.ctaColor, 'color');
       } else if (w.type === 'instaastro_points') {
         fields += fieldSelect('initialView', 'Preview Mode', c.initialView, [['hub', 'Points Hub & Milestone Track'], ['stepper', '7-Day Streak Stepper Sheet']]);
         fields += fieldInput('startingPoints', 'Starting Points', c.startingPoints, 'number');
-        fields += fieldInput('streakBonusPoints', 'Streak Modal Bonus (+)', c.streakBonusPoints, 'number');
-        fields += fieldInput('accentColor', 'Brand Yellow Accent', c.accentColor, 'color');
-        fields += fieldInput('progressColor', 'Stepper Progress Fill', c.progressColor, 'color');
+        fields += fieldInput('streakBonusPoints', 'Streak Bonus (+)', c.streakBonusPoints, 'number');
+        fields += fieldInput('accentColor', 'Accent Color', c.accentColor, 'color');
+        fields += fieldInput('progressColor', 'Progress Fill Color', c.progressColor, 'color');
       } else if (w.type === 'paytm_chest_scratch') {
         fields += fieldSelect('cardTheme', 'Scratch Card Design', c.cardTheme, [['maroon', 'Royal Maroon Elephant'], ['teal', 'Blue-Teal Lotus']]);
         fields += fieldInput('startingCoins', 'Starting Odometer Coins', c.startingCoins, 'number');
         fields += fieldInput('rewardCoins', 'Reward Coins Won', c.rewardCoins, 'number');
       } else if (w.type === 'paytm_spin_win') {
         fields += fieldInput('spinsLeft', 'Initial Spins Left', c.spinsLeft, 'number');
-        fields += fieldInput('starburstColor', 'Starburst Explosion Color', c.starburstColor, 'color');
+        fields += fieldInput('starburstColor', 'Explosion Color', c.starburstColor, 'color');
       } else if (w.type === 'duolingo_flow') {
         fields += fieldSelect('startStep', 'Jump to Stage', String(c.startStep), [['1', 'Stage 1: Lesson Complete'], ['2', 'Stage 2: Ignite Streak'], ['3', 'Stage 3: Streak Goal'], ['4', 'Stage 4: Rare Chest -> x3 XP']]);
-        fields += fieldInput('themeColor', 'Brand Owl Green', c.themeColor, 'color');
+        fields += fieldInput('themeColor', 'Brand Color', c.themeColor, 'color');
         fields += fieldInput('xpEarned', 'Total XP', c.xpEarned, 'number');
         fields += fieldInput('accuracy', 'Accuracy %', c.accuracy, 'number');
         fields += fieldInput('durationText', 'Duration Time', c.durationText);
         fields += fieldInput('streakCount', 'Streak Day Count', c.streakCount, 'number');
-        fields += fieldSelect('lottieTier', 'Rare Chest Tier', c.lottieTier, [['gold', 'Gold Rare Chest'], ['silver', 'Silver Chest'], ['bronze', 'Bronze Chest']]);
+        fields += fieldSelect('lottieTier', 'Chest Tier', c.lottieTier, [['gold', 'Gold Chest'], ['silver', 'Silver Chest'], ['bronze', 'Bronze Chest']]);
       } else if (w.type === 'cred_wheel') {
-        fields += fieldInput('titleScript', 'Script Eyebrow (e.g. spin)', c.titleScript || 'spin');
-        fields += fieldInput('titleSerif', 'Main Title (e.g. the wheel)', c.titleSerif || 'the wheel');
-        fields += fieldInput('partnerName', 'Partner Brand Hub Logo', c.partnerName || 'BOMBAY SHAVING COMPANY');
+        fields += fieldInput('titleScript', 'Script Eyebrow', c.titleScript || 'spin');
+        fields += fieldInput('titleSerif', 'Main Title', c.titleSerif || 'the wheel');
+        fields += fieldInput('partnerName', 'Partner Brand Name', c.partnerName || 'BOMBAY SHAVING COMPANY');
         fields += fieldInput('couponCode', 'Winning Promo Code', c.couponCode || 'CRED899');
         fields += fieldInput('spinCostCoins', 'Spin Cost (Coins)', c.spinCostCoins || 3000, 'number');
       } else if (w.type === 'cred_slot_machine') {
-        fields += fieldInput('eyebrow', 'Speech Bubble Text', c.eyebrow);
+        fields += fieldInput('eyebrow', 'Header Eyebrow', c.eyebrow);
         fields += fieldInput('rewardTitle', 'Winning Reward Title', c.rewardTitle);
         fields += fieldInput('couponCode', 'Dispensed Voucher Code', c.couponCode);
         fields += fieldInput('spinCost', 'Spin Cost (Coins)', c.spinCost || 9000, 'number');
@@ -391,7 +875,7 @@
         const r1 = (c.topThree && c.topThree[0]) || { name: 'Eiden', score: 2430 };
         const r2 = (c.topThree && c.topThree[1]) || { name: 'Jackson', score: 1847 };
         const r3 = (c.topThree && c.topThree[2]) || { name: 'Emma Aria', score: 1674 };
-        fields += fieldInput('rank1Name', 'Rank 1 Champion Name', r1.name);
+        fields += fieldInput('rank1Name', 'Rank 1 Champion', r1.name);
         fields += fieldInput('rank1Score', 'Rank 1 Score', r1.score, 'number');
         fields += fieldInput('rank2Name', 'Rank 2 Name', r2.name);
         fields += fieldInput('rank2Score', 'Rank 2 Score', r2.score, 'number');
@@ -402,15 +886,14 @@
       fields += fieldInput('soundEnabled', 'Enable Sound Effects', c.soundEnabled, 'boolean');
       fields += `
         <div class="btn-row">
-          <button class="save-config-btn" onclick="saveCurrentWidget()"><i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Deploy</button>
-          <button class="reset-config-btn" onclick="resetCurrentWidget()" title="Reset to Recording Default"><i class="fa-solid fa-rotate-left"></i></button>
+          <button class="save-config-btn" onclick="saveCurrentWidget()"><i class="fa-solid fa-cloud-arrow-up"></i> Save Changes</button>
+          <button class="reset-config-btn" onclick="resetCurrentWidget()" title="Reset to Defaults"><i class="fa-solid fa-rotate-left"></i></button>
         </div>
       `;
 
       const form = document.getElementById('customizerForm');
       form.innerHTML = fields;
 
-      // Live bindings
       form.querySelectorAll('.liveCfg').forEach(inp => {
         inp.oninput = () => {
           const k = inp.getAttribute('data-key');
@@ -484,7 +967,6 @@
         const toast = document.getElementById('saveToast');
         toast.style.opacity = '1';
         setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-        confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
       }
     }
 
@@ -526,8 +1008,8 @@
       const w = selectedWidget;
       if (activeTab === 'embed') {
         draw.innerHTML = `
-          <h3 style="font-size:15px; margin-bottom:12px;">Embed "${w.name}" Anywhere in 2 Lines</h3>
-          <div style="font-size:12px; color:#94A3B8; margin-bottom:6px;">1. Inline Embed (Vanilla JS / Next.js / Shopify / Webflow)</div>
+          <h3 style="font-size:14px; font-weight:600; margin-bottom:10px;">Embed "${w.name}" via SDK</h3>
+          <div style="font-size:12px; color:var(--ds-text-secondary); margin-bottom:6px;">Inline Mount:</div>
           <div class="code-box"><button class="copy-btn" onclick="copyText(this.nextElementSibling.innerText)">Copy</button><code>&lt;div id="gamify-slot"&gt;&lt;/div&gt;
 &lt;script src="http://localhost:4000/sdk/gamify.js" data-api-key="pk_live_duo_9821"&gt;&lt;/script&gt;
 &lt;script&gt;
@@ -536,12 +1018,12 @@
   gamify.mount('#gamify-slot', '${w.id}');
 &lt;/script&gt;</code></div>
 
-          <div style="font-size:12px; color:#94A3B8; margin-bottom:6px;">2. Trigger as Popup Modal with Runtime Overrides</div>
+          <div style="font-size:12px; color:var(--ds-text-secondary); margin-bottom:6px;">Modal Launch:</div>
           <div class="code-box"><button class="copy-btn" onclick="copyText(this.nextElementSibling.innerText)">Copy</button><code>gamify.launchModal('${w.id}', ${JSON.stringify(w.config, null, 2)});</code></div>
         `;
       } else {
         draw.innerHTML = `
-          <h3 style="font-size:15px; margin-bottom:12px;">Live REST Schema (GET /api/v1/widgets/${w.id})</h3>
+          <h3 style="font-size:14px; font-weight:600; margin-bottom:10px;">Widget REST Schema (GET /api/v1/widgets/${w.id})</h3>
           <div class="code-box"><button class="copy-btn" onclick="copyText(this.nextElementSibling.innerText)">Copy</button><code>${JSON.stringify(w, null, 2)}</code></div>
         `;
       }
